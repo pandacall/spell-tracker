@@ -1,8 +1,9 @@
 html, body { margin: 0; background: transparent; overflow: hidden; user-select: none; }
-#rows { display: flex; flex-direction: column; gap: 3px; padding: 3px; }
+/* Ghosted so it never competes with the game for attention. */
+#rows { display: flex; flex-direction: column; gap: 3px; padding: 3px; opacity: 0.5; }
 .row {
   display: flex; align-items: center; gap: 3px; padding: 2px;
-  background: rgba(10, 14, 22, 0.78); border-radius: 5px;
+  background: rgba(10, 14, 22, 0.45); border-radius: 5px;
 }
 .row img { width: 28px; height: 28px; border-radius: 3px; display: block; }
 .row .champion { border-radius: 50%; margin-right: 3px; }
