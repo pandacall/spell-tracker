@@ -1,0 +1,941 @@
+{
+  "activePlayer": {
+    "abilities": {
+      "E": {
+        "abilityLevel": 3,
+        "displayName": "Singularity",
+        "id": "AurelionSolE",
+        "rawDescription": "GeneratedTip_Spell_AurelionSolE_Description",
+        "rawDisplayName": "GeneratedTip_Spell_AurelionSolE_DisplayName"
+      },
+      "Passive": {
+        "displayName": "Cosmic Creator",
+        "id": "AurelionSolPassive",
+        "rawDescription": "GeneratedTip_Passive_AurelionSolPassive_Description",
+        "rawDisplayName": "GeneratedTip_Passive_AurelionSolPassive_DisplayName"
+      },
+      "Q": {
+        "abilityLevel": 1,
+        "displayName": "Breath of Light",
+        "id": "AurelionSolQ",
+        "rawDescription": "GeneratedTip_Spell_AurelionSolQ_Description",
+        "rawDisplayName": "GeneratedTip_Spell_AurelionSolQ_DisplayName"
+      },
+      "R": {
+        "abilityLevel": 1,
+        "displayName": "Falling Star / The Skies Descend",
+        "id": "AurelionSolR",
+        "rawDescription": "GeneratedTip_Spell_AurelionSolR_Description",
+        "rawDisplayName": "GeneratedTip_Spell_AurelionSolR_DisplayName"
+      },
+      "W": {
+        "abilityLevel": 1,
+        "displayName": "Astral Flight",
+        "id": "AurelionSolW",
+        "rawDescription": "GeneratedTip_Spell_AurelionSolW_Description",
+        "rawDisplayName": "GeneratedTip_Spell_AurelionSolW_DisplayName"
+      }
+    },
+    "championStats": {
+      "abilityHaste": 13,
+      "abilityPower": 0,
+      "armor": 37.80000305175781,
+      "armorPenetrationFlat": 0,
+      "armorPenetrationPercent": 1,
+      "attackDamage": 70.63999938964844,
+      "attackRange": 550,
+      "attackSpeed": 0.6620312333106995,
+      "bonusArmorPenetrationPercent": 1,
+      "bonusMagicPenetrationPercent": 1,
+      "critChance": 0,
+      "critDamage": 200,
+      "currentHealth": 685.9251708984375,
+      "healShieldPower": 0.05000000074505806,
+      "healthRegenRate": 1.5345001220703125,
+      "lifeSteal": 0,
+      "magicLethality": 0,
+      "magicPenetrationFlat": 0,
+      "magicPenetrationPercent": 1,
+      "magicResist": 35.13500213623047,
+      "maxHealth": 1015.5,
+      "moveSpeed": 348.5,
+      "omnivamp": 0,
+      "physicalLethality": 0,
+      "physicalVamp": 0,
+      "resourceMax": 688,
+      "resourceRegenRate": 2.192500114440918,
+      "resourceType": "MANA",
+      "resourceValue": 104.00320434570312,
+      "spellVamp": 0,
+      "tenacity": 5
+    },
+    "currentGold": 2970.477294921875,
+    "fullRunes": {
+      "generalRunes": [
+        {
+          "displayName": "Summon Aery",
+          "id": 8214,
+          "rawDescription": "perk_tooltip_SummonAery",
+          "rawDisplayName": "perk_displayname_SummonAery"
+        },
+        {
+          "displayName": "Nimbus Cloak",
+          "id": 8275,
+          "rawDescription": "perk_tooltip_NimbusCloak",
+          "rawDisplayName": "perk_displayname_NimbusCloak"
+        },
+        {
+          "displayName": "Transcendence",
+          "id": 8210,
+          "rawDescription": "perk_tooltip_Transcendence",
+          "rawDisplayName": "perk_displayname_Transcendence"
+        },
+        {
+          "displayName": "Waterwalking",
+          "id": 8232,
+          "rawDescription": "perk_tooltip_Waterwalking",
+          "rawDisplayName": "perk_displayname_Waterwalking"
+        },
+        {
+          "displayName": "Bone Plating",
+          "id": 8473,
+          "rawDescription": "perk_tooltip_BonePlatingTooltip",
+          "rawDisplayName": "perk_displayname_BonePlating"
+        },
+        {
+          "displayName": "Revitalize",
+          "id": 8453,
+          "rawDescription": "perk_tooltip_Revitalize",
+          "rawDisplayName": "perk_displayname_Revitalize"
+        }
+      ],
+      "keystone": {
+        "displayName": "Summon Aery",
+        "id": 8214,
+        "rawDescription": "perk_tooltip_SummonAery",
+        "rawDisplayName": "perk_displayname_SummonAery"
+      },
+      "primaryRuneTree": {
+        "displayName": "Sorcery",
+        "id": 8200,
+        "rawDescription": "perkstyle_tooltip_7202",
+        "rawDisplayName": "perkstyle_displayname_7202"
+      },
+      "secondaryRuneTree": {
+        "displayName": "Resolve",
+        "id": 8400,
+        "rawDescription": "perkstyle_tooltip_7204",
+        "rawDisplayName": "perkstyle_displayname_7204"
+      },
+      "statRunes": [
+        {
+          "id": 5007,
+          "rawDescription": "perk_tooltip_StatModCooldownReductionScaling"
+        },
+        {
+          "id": 5010,
+          "rawDescription": "perk_tooltip_StatModMovementSpeed"
+        },
+        {
+          "id": 5001,
+          "rawDescription": "perk_tooltip_StatModHealthScaling"
+        }
+      ]
+    },
+    "level": 6,
+    "riotId": "Player1#0000",
+    "riotIdGameName": "Player1",
+    "riotIdTagLine": "0000",
+    "summonerName": "Player1#0000",
+    "teamRelativeColors": true
+  },
+  "allPlayers": [
+    {
+      "championName": "Aurelion Sol",
+      "isBot": false,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Stealth Ward",
+          "itemID": 3340,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3340_Description",
+          "rawDisplayName": "Item_3340_Name",
+          "slot": 6
+        }
+      ],
+      "level": 6,
+      "position": "JUNGLE",
+      "rawChampionName": "game_character_displayname_AurelionSol",
+      "rawSkinName": "game_character_displayname_AurelionSol",
+      "respawnTimer": 0,
+      "riotId": "Player1#0000",
+      "riotIdGameName": "Player1",
+      "riotIdTagLine": "0000",
+      "runes": {
+        "keystone": {
+          "displayName": "Summon Aery",
+          "id": 8214,
+          "rawDescription": "perk_tooltip_SummonAery",
+          "rawDisplayName": "perk_displayname_SummonAery"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Resolve",
+          "id": 8400,
+          "rawDescription": "perkstyle_tooltip_7204",
+          "rawDisplayName": "perkstyle_displayname_7204"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 10,
+        "deaths": 3,
+        "kills": 2,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Aurelion Sol",
+      "summonerName": "Player1#0000",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Ghost",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerHaste_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHaste_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Smite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerSmite_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+        }
+      },
+      "team": "ORDER"
+    },
+    {
+      "championName": "Malzahar",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Tear of the Goddess",
+          "itemID": 3070,
+          "price": 400,
+          "rawDescription": "GeneratedTip_Item_3070_Description",
+          "rawDisplayName": "Item_3070_Name",
+          "slot": 0
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Lost Chapter",
+          "itemID": 3802,
+          "price": 250,
+          "rawDescription": "GeneratedTip_Item_3802_Description",
+          "rawDisplayName": "Item_3802_Name",
+          "slot": 1
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Boots",
+          "itemID": 1001,
+          "price": 300,
+          "rawDescription": "GeneratedTip_Item_1001_Description",
+          "rawDisplayName": "Item_1001_Name",
+          "slot": 2
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Fated Ashes",
+          "itemID": 2508,
+          "price": 500,
+          "rawDescription": "GeneratedTip_Item_2508_Description",
+          "rawDisplayName": "Item_2508_Name",
+          "slot": 3
+        },
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Stealth Ward",
+          "itemID": 3340,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3340_Description",
+          "rawDisplayName": "Item_3340_Name",
+          "slot": 6
+        }
+      ],
+      "level": 10,
+      "position": "MIDDLE",
+      "rawChampionName": "game_character_displayname_Malzahar",
+      "rawSkinName": "game_character_displayname_Malzahar",
+      "respawnTimer": 0,
+      "riotId": "Malzahar#BOT",
+      "riotIdGameName": "Malzahar",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 90,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Malzahar",
+      "summonerName": "Malzahar Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Unleashed Teleport",
+          "rawDescription": "GeneratedTip_SummonerSpell_S12_SummonerTeleportUpgrade_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_S12_SummonerTeleportUpgrade_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Renata Glasc",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Runic Compass",
+          "itemID": 3866,
+          "price": 400,
+          "rawDescription": "GeneratedTip_Item_3866_Description",
+          "rawDisplayName": "Item_3866_Name",
+          "slot": 0
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Ionian Boots of Lucidity",
+          "itemID": 3158,
+          "price": 350,
+          "rawDescription": "GeneratedTip_Item_3158_Description",
+          "rawDisplayName": "Item_3158_Name",
+          "slot": 1
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Kindlegem",
+          "itemID": 3067,
+          "price": 150,
+          "rawDescription": "GeneratedTip_Item_3067_Description",
+          "rawDisplayName": "Item_3067_Name",
+          "slot": 2
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Cloth Armor",
+          "itemID": 1029,
+          "price": 300,
+          "rawDescription": "GeneratedTip_Item_1029_Description",
+          "rawDisplayName": "Item_1029_Name",
+          "slot": 3
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Null-Magic Mantle",
+          "itemID": 1033,
+          "price": 400,
+          "rawDescription": "GeneratedTip_Item_1033_Description",
+          "rawDisplayName": "Item_1033_Name",
+          "slot": 4
+        },
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Oracle Lens",
+          "itemID": 3364,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3364_Description",
+          "rawDisplayName": "Item_3364_Name",
+          "slot": 6
+        }
+      ],
+      "level": 8,
+      "position": "UTILITY",
+      "rawChampionName": "game_character_displayname_Renata",
+      "rawSkinName": "game_character_displayname_Renata",
+      "respawnTimer": 0,
+      "riotId": "Renata#BOT",
+      "riotIdGameName": "Renata",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 20,
+        "deaths": 2,
+        "kills": 2,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Renata Glasc",
+      "summonerName": "Renata Glasc Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Heal",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerHeal_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Zaahen",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Scorchclaw Pup",
+          "itemID": 1101,
+          "price": 450,
+          "rawDescription": "GeneratedTip_Item_1101_Description",
+          "rawDisplayName": "Item_1101_Name",
+          "slot": 0
+        },
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Stealth Ward",
+          "itemID": 3340,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3340_Description",
+          "rawDisplayName": "Item_3340_Name",
+          "slot": 6
+        }
+      ],
+      "level": 8,
+      "position": "JUNGLE",
+      "rawChampionName": "game_character_displayname_Zaahen",
+      "rawSkinName": "game_character_displayname_Zaahen",
+      "respawnTimer": 0,
+      "riotId": "Zaahen#BOT",
+      "riotIdGameName": "Zaahen",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Electrocute",
+          "id": 8112,
+          "rawDescription": "perk_tooltip_Electrocute",
+          "rawDisplayName": "perk_displayname_Electrocute"
+        },
+        "primaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Precision",
+          "id": 8000,
+          "rawDescription": "perkstyle_tooltip_7201",
+          "rawDisplayName": "perkstyle_displayname_7201"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 40,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 4.783333778381348
+      },
+      "skinID": 0,
+      "skinName": "Zaahen",
+      "summonerName": "Zaahen Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Unleashed Smite",
+          "rawDescription": "GeneratedTip_SummonerSpell_S5_SummonerSmitePlayerGanker_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_S5_SummonerSmitePlayerGanker_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Swain",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Doran's Ring",
+          "itemID": 1056,
+          "price": 400,
+          "rawDescription": "GeneratedTip_Item_1056_Description",
+          "rawDisplayName": "Item_1056_Name",
+          "slot": 0
+        },
+        {
+          "canUse": true,
+          "consumable": true,
+          "count": 1,
+          "displayName": "Control Ward",
+          "itemID": 2055,
+          "price": 75,
+          "rawDescription": "GeneratedTip_Item_2055_Description",
+          "rawDisplayName": "Item_2055_Name",
+          "slot": 1
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Giant's Belt",
+          "itemID": 1011,
+          "price": 500,
+          "rawDescription": "GeneratedTip_Item_1011_Description",
+          "rawDisplayName": "Item_1011_Name",
+          "slot": 2
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Lost Chapter",
+          "itemID": 3802,
+          "price": 250,
+          "rawDescription": "GeneratedTip_Item_3802_Description",
+          "rawDisplayName": "Item_3802_Name",
+          "slot": 4
+        },
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Stealth Ward",
+          "itemID": 3340,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3340_Description",
+          "rawDisplayName": "Item_3340_Name",
+          "slot": 6
+        }
+      ],
+      "level": 8,
+      "position": "BOTTOM",
+      "rawChampionName": "game_character_displayname_Swain",
+      "rawSkinName": "game_character_displayname_Swain",
+      "respawnTimer": 0,
+      "riotId": "Swain#BOT",
+      "riotIdGameName": "Swain",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 2,
+        "creepScore": 70,
+        "deaths": 1,
+        "kills": 1,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Swain",
+      "summonerName": "Swain Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Ghost",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerHaste_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHaste_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Yorick",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Doran's Shield",
+          "itemID": 1054,
+          "price": 450,
+          "rawDescription": "GeneratedTip_Item_1054_Description",
+          "rawDisplayName": "Item_1054_Name",
+          "slot": 0
+        },
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Plated Steelcaps",
+          "itemID": 3047,
+          "price": 600,
+          "rawDescription": "GeneratedTip_Item_3047_Description",
+          "rawDisplayName": "Item_3047_Name",
+          "slot": 2
+        },
+        {
+          "canUse": true,
+          "consumable": true,
+          "count": 1,
+          "displayName": "Control Ward",
+          "itemID": 2055,
+          "price": 75,
+          "rawDescription": "GeneratedTip_Item_2055_Description",
+          "rawDisplayName": "Item_2055_Name",
+          "slot": 3
+        },
+        {
+          "canUse": true,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Stealth Ward",
+          "itemID": 3340,
+          "price": 0,
+          "rawDescription": "GeneratedTip_Item_3340_Description",
+          "rawDisplayName": "Item_3340_Name",
+          "slot": 6
+        }
+      ],
+      "level": 10,
+      "position": "TOP",
+      "rawChampionName": "game_character_displayname_Yorick",
+      "rawSkinName": "game_character_displayname_Yorick",
+      "respawnTimer": 0,
+      "riotId": "Yorick#BOT",
+      "riotIdGameName": "Yorick",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Grasp of the Undying",
+          "id": 8437,
+          "rawDescription": "perk_tooltip_GraspOfTheUndying",
+          "rawDisplayName": "perk_displayname_GraspOfTheUndying"
+        },
+        "primaryRuneTree": {
+          "displayName": "Resolve",
+          "id": 8400,
+          "rawDescription": "perkstyle_tooltip_7204",
+          "rawDisplayName": "perkstyle_displayname_7204"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 80,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Yorick",
+      "summonerName": "Yorick Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Unleashed Teleport",
+          "rawDescription": "GeneratedTip_SummonerSpell_S12_SummonerTeleportUpgrade_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_S12_SummonerTeleportUpgrade_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    }
+  ],
+  "events": {
+    "Events": [
+      {
+        "EventID": 0,
+        "EventName": "GameStart",
+        "EventTime": 0.04291050136089325
+      },
+      {
+        "EventID": 1,
+        "EventName": "MinionsSpawning",
+        "EventTime": 30.045061111450195
+      },
+      {
+        "Assisters": [],
+        "EventID": 2,
+        "EventName": "ChampionKill",
+        "EventTime": 91.9178695678711,
+        "KillerName": "Turret_TOrder_L0_P3_3795288474_0",
+        "VictimName": "Renata Glasc Bot"
+      },
+      {
+        "Assisters": [
+          "Swain Bot"
+        ],
+        "EventID": 3,
+        "EventName": "ChampionKill",
+        "EventTime": 151.7171173095703,
+        "KillerName": "Renata Glasc Bot",
+        "VictimName": "Player1"
+      },
+      {
+        "EventID": 4,
+        "EventName": "FirstBlood",
+        "EventTime": 151.7171173095703,
+        "Recipient": "Renata Glasc Bot"
+      },
+      {
+        "Acer": "Renata Glasc Bot",
+        "AcingTeam": "CHAOS",
+        "EventID": 5,
+        "EventName": "Ace",
+        "EventTime": 151.7171173095703
+      },
+      {
+        "Assisters": [],
+        "EventID": 6,
+        "EventName": "ChampionKill",
+        "EventTime": 277.8485412597656,
+        "KillerName": "Swain Bot",
+        "VictimName": "Player1"
+      },
+      {
+        "Acer": "Swain Bot",
+        "AcingTeam": "CHAOS",
+        "EventID": 7,
+        "EventName": "Ace",
+        "EventTime": 277.8485412597656
+      },
+      {
+        "Assisters": [],
+        "EventID": 8,
+        "EventName": "ChampionKill",
+        "EventTime": 449.7413024902344,
+        "KillerName": "Player1",
+        "VictimName": "Swain Bot"
+      },
+      {
+        "Assisters": [],
+        "EventID": 9,
+        "EventName": "ChampionKill",
+        "EventTime": 454.9071350097656,
+        "KillerName": "Player1",
+        "VictimName": "Renata Glasc Bot"
+      },
+      {
+        "EventID": 10,
+        "EventName": "Multikill",
+        "EventTime": 454.9071350097656,
+        "KillStreak": 2,
+        "KillerName": "Player1"
+      },
+      {
+        "EventID": 11,
+        "EventName": "FirstBrick",
+        "EventTime": 480.7074890136719,
+        "KillerName": "Yorick Bot"
+      },
+      {
+        "Assisters": [],
+        "EventID": 12,
+        "EventName": "TurretKilled",
+        "EventTime": 480.7074890136719,
+        "KillerName": "Yorick Bot",
+        "TurretKilled": "Turret_TOrder_L2_P3_1509986696_0"
+      },
+      {
+        "Assisters": [
+          "Swain Bot"
+        ],
+        "EventID": 13,
+        "EventName": "ChampionKill",
+        "EventTime": 503.3334655761719,
+        "KillerName": "Renata Glasc Bot",
+        "VictimName": "Player1"
+      },
+      {
+        "Acer": "Renata Glasc Bot",
+        "AcingTeam": "CHAOS",
+        "EventID": 14,
+        "EventName": "Ace",
+        "EventTime": 503.3334655761719
+      },
+      {
+        "Assisters": [
+          "Yorick Bot"
+        ],
+        "EventID": 15,
+        "EventName": "HordeKill",
+        "EventTime": 540.0388793945312,
+        "KillerName": "Zaahen Bot",
+        "Stolen": "False"
+      },
+      {
+        "Assisters": [
+          "Yorick Bot"
+        ],
+        "EventID": 16,
+        "EventName": "HordeKill",
+        "EventTime": 556.4281616210938,
+        "KillerName": "Zaahen Bot",
+        "Stolen": "False"
+      },
+      {
+        "Assisters": [
+          "Yorick Bot"
+        ],
+        "EventID": 17,
+        "EventName": "HordeKill",
+        "EventTime": 570.8112182617188,
+        "KillerName": "Zaahen Bot",
+        "Stolen": "False"
+      },
+      {
+        "Assisters": [
+          "Renata Glasc Bot"
+        ],
+        "DragonType": "Earth",
+        "EventID": 18,
+        "EventName": "DragonKill",
+        "EventTime": 621.1085815429688,
+        "KillerName": "Zaahen Bot",
+        "Stolen": "False"
+      },
+      {
+        "Assisters": [],
+        "EventID": 19,
+        "EventName": "TurretKilled",
+        "EventTime": 683.7984619140625,
+        "KillerName": "Renata Glasc Bot",
+        "TurretKilled": "Turret_TOrder_L0_P3_3795288474_0"
+      },
+      {
+        "Assisters": [],
+        "EventID": 20,
+        "EventName": "TurretKilled",
+        "EventTime": 687.5261840820312,
+        "KillerName": "Yorick Bot",
+        "TurretKilled": "Turret_TOrder_L2_P2_1526764315_0"
+      },
+      {
+        "Assisters": [],
+        "EventID": 21,
+        "EventName": "TurretKilled",
+        "EventTime": 763.3594970703125,
+        "KillerName": "Malzahar Bot",
+        "TurretKilled": "Turret_TOrder_L1_P3_1242677625_0"
+      }
+    ]
+  },
+  "gameData": {
+    "gameMode": "CLASSIC",
+    "gameTime": 794.709716796875,
+    "mapName": "Map11",
+    "mapNumber": 11,
+    "mapTerrain": "Default"
+  }
+}

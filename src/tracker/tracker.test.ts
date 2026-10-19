@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import customVsBots from "../../fixtures/custom-vs-bots.json";
 import draft from "../../fixtures/draft-summoners-rift.json";
+import unleashedSmite from "../../fixtures/smite-unleashed-vs-bots.json";
 import unleashedTeleport from "../../fixtures/teleport-unleashed-vs-bots.json";
 import { createTracker } from "./tracker";
 
@@ -51,6 +52,18 @@ describe("Tracker", () => {
     expect(malzahar?.spells).toEqual([
       { id: "SummonerFlash", name: "Flash" },
       { id: "SummonerTeleport", name: "Unleashed Teleport" },
+    ]);
+  });
+
+  it("identifies upgraded Smite as Smite for its icon, keeping its own name", () => {
+    const tracker = createTracker();
+
+    tracker.feed(unleashedSmite);
+
+    const zaahen = tracker.overlay().rows.find((row) => row.champion.name === "Zaahen");
+    expect(zaahen?.spells).toEqual([
+      { id: "SummonerFlash", name: "Flash" },
+      { id: "SummonerSmite", name: "Unleashed Smite" },
     ]);
   });
 

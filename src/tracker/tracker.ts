@@ -49,9 +49,11 @@ interface FeedSnapshot {
 }
 
 // Spells whose raw name changes mid-game (Teleport becomes Unleashed Teleport at
-// 10:00), mapped to the base spell they are, so they keep one id and one icon.
+// 10:00, Smite upgrades with the jungle item), mapped to the base spell they
+// are, so they keep one id and one icon.
 const BASE_SPELL_ID: Record<string, string> = {
   S12_SummonerTeleportUpgrade: "SummonerTeleport",
+  S5_SummonerSmitePlayerGanker: "SummonerSmite",
 };
 
 function spellOf(spell: FeedSpell): Spell {
