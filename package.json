@@ -1,0 +1,21 @@
+{
+  "name": "spell-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal League of Legends enemy summoner spell overlay",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "start": "npm run build && electron .",
+    "capture": "npm run build && node dist/capture/capture.js",
+    "shortcut": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "electron": "^44.9.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
