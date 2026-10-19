@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_SETTINGS } from "../settings/settings";
 import { createShare } from "./share";
 
 function setup(options: { gameRunning?: boolean; autoSend?: boolean; shareLine?: string } = {}) {
   const sent: Array<{ message: string; submit: boolean }> = [];
   const state = { gameRunning: options.gameRunning ?? true, shareLine: options.shareLine ?? "1230 mid 1440 bot" };
   const share = createShare({
-    settings: { shareKey: "`", autoSend: options.autoSend ?? true },
+    settings: { ...DEFAULT_SETTINGS, autoSend: options.autoSend ?? true },
     sender: { send: async (message, { submit }) => void sent.push({ message, submit }) },
     shareLine: () => state.shareLine,
     isGameRunning: () => state.gameRunning,
@@ -62,7 +63,7 @@ describe("Share", () => {
     const sent: string[] = [];
     let finishTyping = () => {};
     const share = createShare({
-      settings: { shareKey: "`", autoSend: true },
+      settings: { ...DEFAULT_SETTINGS, autoSend: true },
       sender: {
         send: (message) => {
           sent.push(message);
@@ -96,7 +97,7 @@ describe("Share", () => {
     const sent: string[] = [];
     let release = () => {};
     const share = createShare({
-      settings: { shareKey: "`", autoSend: true },
+      settings: { ...DEFAULT_SETTINGS, autoSend: true },
       sender: { send: async (message) => void sent.push(message) },
       shareLine: () => "1230 mid",
       isGameRunning: () => true,

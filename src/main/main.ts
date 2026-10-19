@@ -3,7 +3,7 @@ import { autoUpdater } from "electron-updater";
 import path from "node:path";
 import { createChatSender } from "../chat-sender/chat-sender";
 import { startGameFeed } from "../game-feed/game-feed";
-import { loadSettings, saveOverlayPosition } from "../settings/settings";
+import { createSettingsStore } from "../settings/settings";
 import { createShare } from "../share/share";
 import { createTracker } from "../tracker/tracker";
 import { startUpdates, type Updates } from "../updater/updater";
@@ -34,7 +34,8 @@ if (!app.requestSingleInstanceLock()) {
 
     // Read once at startup; edit the file and restart to change a setting.
     const settingsPath = path.join(app.getPath("userData"), "settings.json");
-    const settings = loadSettings(settingsPath);
+    const store = createSettingsStore(settingsPath);
+    const settings = store.current();
 
     const renderOverlay = () => overlayWindow.render(tracker.overlay(), iconVersion);
     const overlayWindow = createOverlayWindow({
@@ -47,7 +48,7 @@ if (!app.requestSingleInstanceLock()) {
         tracker.clear(championId, spellId);
         renderOverlay();
       },
-      onMoved: (position) => saveOverlayPosition(settingsPath, position),
+      onMoved: (position) => store.update({ overlayPosition: position }),
     });
     const shareVirtualKey = virtualKeyOf(settings.shareKey);
     if (shareVirtualKey === undefined) {
