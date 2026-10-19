@@ -57,18 +57,20 @@ interface FeedSnapshot {
   allPlayers: FeedPlayer[];
 }
 
-// Spells whose raw name changes mid-game (Teleport becomes Unleashed Teleport at
-// 10:00, Smite upgrades with the jungle item), mapped to the base spell they
-// are, so they keep one id and one icon.
-const BASE_SPELL_ID: Record<string, string> = {
-  S12_SummonerTeleportUpgrade: "SummonerTeleport",
-  S5_SummonerSmitePlayerGanker: "SummonerSmite",
-};
+// Some spells change their raw name mid-game: Teleport becomes Unleashed Teleport
+// at 10:00, and Smite upgrades into several variants (Unleashed, Primal, ...).
+// Data Dragon has no icons for the variants, and there may be more than we have
+// seen, so any raw id naming Smite or Teleport is that base spell.
+function baseSpellId(rawId: string): string {
+  if (rawId.includes("Smite")) return "SummonerSmite";
+  if (rawId.includes("Teleport")) return "SummonerTeleport";
+  return rawId;
+}
 
 function spellOf(spell: FeedSpell): Spell {
   const match = /^GeneratedTip_SummonerSpell_(.+)_DisplayName$/.exec(spell.rawDisplayName);
   const rawId = match ? match[1] : spell.rawDisplayName;
-  return { id: BASE_SPELL_ID[rawId] ?? rawId, name: spell.displayName };
+  return { id: baseSpellId(rawId), name: spell.displayName };
 }
 
 function championOf(player: FeedPlayer): Champion {

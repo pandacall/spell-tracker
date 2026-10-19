@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import customVsBots from "../../fixtures/custom-vs-bots.json";
 import draft from "../../fixtures/draft-summoners-rift.json";
+import primalSmite from "../../fixtures/smite-primal-vs-bots.json";
 import unleashedSmite from "../../fixtures/smite-unleashed-vs-bots.json";
 import unleashedTeleport from "../../fixtures/teleport-unleashed-vs-bots.json";
 import { createTracker } from "./tracker";
@@ -89,6 +90,22 @@ describe("Tracker", () => {
       { id: "SummonerFlash", name: "Flash" },
       { id: "SummonerSmite", name: "Unleashed Smite" },
     ]);
+  });
+
+  it("identifies every Smite variant as Smite, including ones it has not seen", () => {
+    const tracker = createTracker();
+    tracker.feed(primalSmite);
+    const gragas = tracker.overlay().rows.find((row) => row.champion.name === "Gragas");
+    expect(gragas?.spells[1]).toEqual({ id: "SummonerSmite", name: "Primal Smite" });
+
+    const unseenVariant = structuredClone(primalSmite);
+    unseenVariant.allPlayers[1].summonerSpells.summonerSpellTwo.rawDisplayName =
+      "GeneratedTip_SummonerSpell_SummonerSmiteAvatarSomethingNew_DisplayName";
+    const other = createTracker();
+    other.feed(unseenVariant);
+    expect(other.overlay().rows.find((row) => row.champion.name === "Gragas")?.spells[1].id).toBe(
+      "SummonerSmite",
+    );
   });
 
   it("ignores games that are not on Summoner's Rift", () => {
