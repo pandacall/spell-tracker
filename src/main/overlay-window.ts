@@ -157,6 +157,8 @@ export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindo
 
   return {
     render(state, iconVersion) {
+      // While quitting, closing the settings window hides the sample overlay after this window may be gone.
+      if (window.isDestroyed()) return;
       latest = JSON.stringify({ state, iconVersion });
       send();
       if (state.visible && !window.isVisible()) window.showInactive();
