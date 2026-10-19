@@ -13,14 +13,25 @@ export interface OverlaySpell extends Spell {
   countdown?: number;
 }
 
+// Role order, top of the overlay first.
+const ROLES = ["top", "jg", "mid", "bot", "sup"] as const;
+
+/** An Enemy's Role; `bot` is always the ADC, never the support. */
+export type Role = (typeof ROLES)[number];
+
 export interface EnemyRow {
+  /** Absent when the feed's positions couldn't give every Enemy a Role (see `roleSetupNeeded`). */
+  role?: Role;
   champion: Champion;
   spells: [OverlaySpell, OverlaySpell];
 }
 
 export interface OverlayState {
   visible: boolean;
+  /** In Role order, or in game-feed order when `roleSetupNeeded`. */
   rows: EnemyRow[];
+  /** True when the feed's positions couldn't order the rows, so they have no Roles yet. */
+  roleSetupNeeded: boolean;
 }
 
 export type TrackerSignal = "game-started" | "game-ended";
@@ -45,6 +56,7 @@ interface FeedPlayer {
   rawChampionName: string;
   riotId: string;
   team: string;
+  position?: string;
   summonerSpells: { summonerSpellOne: FeedSpell; summonerSpellTwo: FeedSpell };
 }
 
@@ -56,6 +68,16 @@ interface FeedSnapshot {
   activePlayer: { riotId: string };
   allPlayers: FeedPlayer[];
 }
+
+// The feed reports NONE, an empty string or nothing for a player it can't place
+// (blind pick), so any other value is simply not a Role.
+const ROLE_OF_POSITION = new Map<string, Role>([
+  ["TOP", "top"],
+  ["JUNGLE", "jg"],
+  ["MIDDLE", "mid"],
+  ["BOTTOM", "bot"],
+  ["UTILITY", "sup"],
+]);
 
 // Some spells change their raw name mid-game: Teleport becomes Unleashed Teleport
 // at 10:00, and Smite upgrades into several variants (Unleashed, Primal, ...).
@@ -96,34 +118,52 @@ const BASE_COOLDOWN: Record<string, number> = {
 // (A GameEnd event in a snapshot ends it at once.)
 const MISSED_POLLS_BEFORE_GAME_ENDS = 5;
 
-const NO_GAME: OverlayState = { visible: false, rows: [] };
+const NO_GAME: OverlayState = { visible: false, rows: [], roleSetupNeeded: false };
 
 function hasGameEnded(snapshot: FeedSnapshot): boolean {
   return snapshot.events?.Events?.some((event) => event.EventName === "GameEnd") === true;
+}
+
+/** True when every Enemy has a Role and no two share one, so the Roles can order the rows. */
+function isCompleteRoles(roles: Array<Role | undefined>): roles is Role[] {
+  return !roles.includes(undefined) && new Set(roles).size === roles.length;
+}
+
+function rowOf(player: FeedPlayer, role?: Role): EnemyRow {
+  return {
+    ...(role && { role }),
+    champion: championOf(player),
+    spells: [
+      spellOf(player.summonerSpells.summonerSpellOne),
+      spellOf(player.summonerSpells.summonerSpellTwo),
+    ],
+  };
 }
 
 /**
  * The Enemies of a Summoner's Rift snapshot, or undefined when the snapshot is
  * for another map, has no roster yet, doesn't include the active player (e.g.
  * spectating), or isn't shaped the way the feed normally is (the game may still
- * be loading).
+ * be loading). When the feed's positions can't give every Enemy a Role, the rows
+ * keep game-feed order and carry none.
  */
-function enemiesOf(snapshot: FeedSnapshot): EnemyRow[] | undefined {
+function enemiesOf(snapshot: FeedSnapshot): Pick<OverlayState, "rows" | "roleSetupNeeded"> | undefined {
   try {
     if (snapshot.gameData.mapNumber !== SUMMONERS_RIFT_MAP_NUMBER) return undefined;
     const { allPlayers } = snapshot;
     const me = allPlayers.find((player) => player.riotId === snapshot.activePlayer.riotId);
     if (!me) return undefined;
-    const rows = allPlayers
-      .filter((player) => player.team !== me.team)
-      .map((player): EnemyRow => ({
-        champion: championOf(player),
-        spells: [
-          spellOf(player.summonerSpells.summonerSpellOne),
-          spellOf(player.summonerSpells.summonerSpellTwo),
-        ],
-      }));
-    return rows.length > 0 ? rows : undefined;
+    const enemies = allPlayers.filter((player) => player.team !== me.team);
+    if (enemies.length === 0) return undefined;
+    const roles = enemies.map((player) => ROLE_OF_POSITION.get(player.position ?? ""));
+    if (!isCompleteRoles(roles)) {
+      return { rows: enemies.map((player) => rowOf(player)), roleSetupNeeded: true };
+    }
+    const rows = enemies
+      .map((player, index) => ({ player, role: roles[index] }))
+      .sort((a, b) => ROLES.indexOf(a.role) - ROLES.indexOf(b.role))
+      .map(({ player, role }) => rowOf(player, role));
+    return { rows, roleSetupNeeded: false };
   } catch {
     return undefined;
   }
@@ -168,10 +208,10 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
         return "game-ended";
       }
 
-      const rows = enemiesOf(parsed);
-      if (!rows) return undefined;
+      const enemies = enemiesOf(parsed);
+      if (!enemies) return undefined;
       const signal = state.visible ? undefined : "game-started";
-      state = { visible: true, rows };
+      state = { visible: true, ...enemies };
       // A snapshot without a game time leaves the clock as it was.
       const reported = parsed.gameData.gameTime;
       clock = { game: typeof reported === "number" ? reported : gameTime(), seenAt: now() };
