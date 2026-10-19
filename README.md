@@ -4,6 +4,22 @@ A personal Windows overlay for League of Legends (Summoner's Rift) that tracks t
 
 It only reads Riot's official Live Client Data API on `127.0.0.1:2999` (see ADR 0001).
 
+## Install (Windows)
+
+1. **[Download Spell-Tracker-Setup.exe](https://github.com/pandacall/spell-tracker/releases/latest/download/Spell-Tracker-Setup.exe)** and open it. If your browser says the file "isn't commonly downloaded", choose **Keep**.
+2. Windows may show a blue **"Windows protected your PC"** box, because the app isn't from a big publisher. Click **More info**, then **Run anyway**.
+3. It installs by itself in a few seconds and starts. No admin password is needed. You get a **Spell Tracker** shortcut on the desktop and in the Start Menu.
+
+Using it:
+
+- A small blue icon sits in the system tray, by the clock (it may be hidden under the `^` arrow). Right-click it and choose **Exit** to close the app.
+- The overlay shows up by itself once a game has loaded.
+- **Left-click** an enemy's spell when they use it to start its countdown. **Right-click** it to clear a mistake. Drag the handle to move the overlay.
+- Press **`** (the key under Esc) to type the enemies' Flash timers into chat, then press Enter to send.
+- If you can't see the overlay in game, set League's **Window Mode** to **Borderless** (Settings → Video).
+
+To update, download and run the installer again. To uninstall, use Windows **Settings → Apps → Spell Tracker**.
+
 ## Settings
 
 Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after editing; a missing file means the defaults):
@@ -24,3 +40,14 @@ Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after edi
 | `npm test` | Run the tests (Vitest) |
 | `npm run typecheck` | Typecheck source and tests |
 | `npm run capture -- <name>` | While a game is running, save its game-feed snapshot to `fixtures/<name>.json` with player identities scrubbed |
+| `npm run dist` | Build the installer to `release/Spell-Tracker-Setup.exe` |
+
+## Making a release
+
+Bump `version` in `package.json`, run `npm run dist`, then attach the installer to a new GitHub release:
+
+```bash
+gh release create v0.1.0 release/Spell-Tracker-Setup.exe --title "Spell Tracker 0.1.0" --notes "Download Spell-Tracker-Setup.exe below and open it."
+```
+
+The download link in Install always points at the newest release, so friends' links never go stale.

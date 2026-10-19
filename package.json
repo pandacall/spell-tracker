@@ -10,11 +10,39 @@
     "test": "vitest run",
     "start": "npm run build && electron .",
     "capture": "npm run build && node dist/capture/capture.js",
-    "shortcut": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1"
+    "shortcut": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1",
+    "dist": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.pandacall.spell-tracker",
+    "productName": "Spell Tracker",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/capture/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Spell Tracker",
+      "runAfterFinish": true,
+      "artifactName": "Spell-Tracker-Setup.${ext}"
+    }
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
     "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   },
