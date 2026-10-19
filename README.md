@@ -13,7 +13,7 @@ Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after edi
 ```
 
 - `shareKey`: the system-wide Share key, a single character or a function key (`F1` to `F24`). It is only watched while a game is running. The key still reaches the game (a Windows hotkey would be swallowed, but League never lets those fire), so pick one League doesn't use.
-- `autoSend` (default `false`): what the Share key does with the Share Line (every enemy whose Flash is down, e.g. `1230 mid 1440 bot`). When `false` the Share Line is shown large on the overlay for about 5 seconds for you to type. When `true` it is sent to team chat with simulated keystrokes (Enter, the Share Line, Enter). With no Flash down the Share key does nothing.
+- `autoSend` (default `false`): what the Share key does with the Share Line (every Enemy whose Flash is down, e.g. `1230 mid 1440 bot`). It presses Enter to open chat and types the Share Line with simulated keystrokes, then stops so you can send it (press Enter) or edit it yourself. When `true` it also presses Enter at the end to send it. With no Flash down the Share key does nothing.
 
 ## Commands
 

@@ -6,11 +6,11 @@ League's in-game chat ignores the Windows clipboard, so the only way to Share wi
 
 - One Share key press sends exactly one message. No loops, repeats or scheduled sends.
 - Software-simulated keystrokes only. Never read game memory, never install a low-level input driver (e.g. Interception, which breaks Vanguard games), and never use a USB HID device such as an Arduino or Pi Pico to type — Vanguard treats that hardware profile as cheat hardware and it risks a hardware ban.
-- Auto-send is a setting. When off, Share falls back to showing the Share Line large on the overlay for the user to type.
+- Auto-send is a setting. When off, Share still opens chat and types the Share Line but stops before the final Enter, leaving the user to send, edit or discard it.
 
 ## Considered Options
 
-- **User types the Share Line from the overlay**: zero risk, kept as the fallback.
+- **User types the Share Line from the overlay**: zero risk, but the user does not want it; typing the line and leaving the final Enter to the user is the fallback instead.
 - **Clipboard paste**: impossible; verified in game that chat ignores the Windows clipboard.
 - **Serial-driven USB HID device**: rejected as the highest-risk option despite producing "real" keystrokes.
 - **Built-in scoreboard ping** ("[Champion] used Flash"): carries no Ready Time.

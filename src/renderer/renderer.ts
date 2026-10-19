@@ -1,12 +1,7 @@
 // Plain browser script (no imports), loaded by index.html.
 interface RendererSpell { id: string; name: string; countdown?: number }
 interface RendererRow { champion: { id: string; name: string }; spells: RendererSpell[] }
-interface RendererPayload {
-  state: { visible: boolean; rows: RendererRow[] };
-  iconVersion: string;
-  /** Shown large below the rows while present. */
-  shareLine?: string;
-}
+interface RendererPayload { state: { visible: boolean; rows: RendererRow[] }; iconVersion: string }
 
 declare const overlayApi: {
   onState(listener: (payload: RendererPayload) => void): void;
@@ -51,20 +46,7 @@ function spellElement(championId: string, spell: RendererSpell, iconVersion: str
   return element;
 }
 
-/** The Share Line one `<Ready Time> <Role>` pair to a line; the space inside a pair doesn't wrap. */
-function shareLineElements(shareLine: string): HTMLElement[] {
-  const words = shareLine.split(" ");
-  const pairs: HTMLElement[] = [];
-  for (let index = 0; index < words.length; index += 2) {
-    const pair = document.createElement("div");
-    pair.textContent = words.slice(index, index + 2).join(" ");
-    pairs.push(pair);
-  }
-  return pairs;
-}
-
-overlayApi.onState(({ state, iconVersion, shareLine }) => {
-  document.getElementById("share-line")!.replaceChildren(...(shareLine ? shareLineElements(shareLine) : []));
+overlayApi.onState(({ state, iconVersion }) => {
   const container = document.getElementById("rows")!;
   container.replaceChildren(
     ...state.rows.map((row) => {

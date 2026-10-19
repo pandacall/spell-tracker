@@ -11,8 +11,6 @@ export function createShare(deps: {
   sender: ChatSender;
   /** The current Share Line; empty when no Flash is down. */
   shareLine(): string;
-  /** Puts the Share Line large on the overlay for the user to type (auto-send off). */
-  showOnOverlay(line: string): void;
   isGameRunning(): boolean;
   /** Resolves once the Share key is physically up. */
   keyReleased(): Promise<void>;
@@ -27,15 +25,11 @@ export function createShare(deps: {
       if (busy || !deps.isGameRunning()) return;
       const line = deps.shareLine();
       if (line === "") return;
-      if (!deps.settings.autoSend) {
-        deps.showOnOverlay(line);
-        return;
-      }
       busy = true;
       try {
         // The still-held key would otherwise reach the game or its chat box.
         await deps.keyReleased();
-        await deps.sender.send(line, { submit: true });
+        await deps.sender.send(line, { submit: deps.settings.autoSend });
       } finally {
         busy = false;
       }
