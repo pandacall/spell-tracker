@@ -48,9 +48,16 @@ interface FeedSnapshot {
   allPlayers: FeedPlayer[];
 }
 
+// Spells whose raw name changes mid-game (Teleport becomes Unleashed Teleport at
+// 10:00), mapped to the base spell they are, so they keep one id and one icon.
+const BASE_SPELL_ID: Record<string, string> = {
+  S12_SummonerTeleportUpgrade: "SummonerTeleport",
+};
+
 function spellOf(spell: FeedSpell): Spell {
   const match = /^GeneratedTip_SummonerSpell_(.+)_DisplayName$/.exec(spell.rawDisplayName);
-  return { id: match ? match[1] : spell.rawDisplayName, name: spell.displayName };
+  const rawId = match ? match[1] : spell.rawDisplayName;
+  return { id: BASE_SPELL_ID[rawId] ?? rawId, name: spell.displayName };
 }
 
 function championOf(player: FeedPlayer): Champion {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import customVsBots from "../../fixtures/custom-vs-bots.json";
 import draft from "../../fixtures/draft-summoners-rift.json";
+import unleashedTeleport from "../../fixtures/teleport-unleashed-vs-bots.json";
 import { createTracker } from "./tracker";
 
 describe("Tracker", () => {
@@ -38,6 +39,18 @@ describe("Tracker", () => {
       "Jinx",
       "Karthus",
       "Mordekaiser",
+    ]);
+  });
+
+  it("identifies Unleashed Teleport as Teleport for its icon, keeping its own name", () => {
+    const tracker = createTracker();
+
+    tracker.feed(unleashedTeleport);
+
+    const malzahar = tracker.overlay().rows.find((row) => row.champion.name === "Malzahar");
+    expect(malzahar?.spells).toEqual([
+      { id: "SummonerFlash", name: "Flash" },
+      { id: "SummonerTeleport", name: "Unleashed Teleport" },
     ]);
   });
 
