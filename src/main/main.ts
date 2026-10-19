@@ -2,7 +2,7 @@ import { app, net } from "electron";
 import path from "node:path";
 import { createChatSender } from "../chat-sender/chat-sender";
 import { startGameFeed } from "../game-feed/game-feed";
-import { loadSettings } from "../settings/settings";
+import { loadSettings, saveOverlayPosition } from "../settings/settings";
 import { createShare } from "../share/share";
 import { createTracker } from "../tracker/tracker";
 import { createOverlayWindow } from "./overlay-window";
@@ -27,12 +27,26 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.whenReady().then(() => {
     const tray = createTray();
-    const overlayWindow = createOverlayWindow();
     const tracker = createTracker();
     void refreshIconVersion();
 
     // Read once at startup; edit the file and restart to change a setting.
-    const settings = loadSettings(path.join(app.getPath("userData"), "settings.json"));
+    const settingsPath = path.join(app.getPath("userData"), "settings.json");
+    const settings = loadSettings(settingsPath);
+
+    const renderOverlay = () => overlayWindow.render(tracker.overlay(), iconVersion);
+    const overlayWindow = createOverlayWindow({
+      position: settings.overlayPosition,
+      onMark: (championId, spellId) => {
+        tracker.mark(championId, spellId);
+        renderOverlay();
+      },
+      onClear: (championId, spellId) => {
+        tracker.clear(championId, spellId);
+        renderOverlay();
+      },
+      onMoved: (position) => saveOverlayPosition(settingsPath, position),
+    });
     const shareVirtualKey = virtualKeyOf(settings.shareKey);
     if (shareVirtualKey === undefined) {
       console.error(`Unsupported Share key "${settings.shareKey}": use a single character or F1-F24.`);
@@ -60,11 +74,15 @@ if (!app.requestSingleInstanceLock()) {
       const signal = tracker.feed(snapshot);
       if (signal === "game-started") startWatchingShareKey();
       if (signal === "game-ended") stopWatching?.();
-      overlayWindow.render(tracker.overlay(), iconVersion);
+      renderOverlay();
     });
+
+    // Countdowns tick between game-feed polls. Rendering an unchanged overlay is a no-op.
+    const ticker = setInterval(renderOverlay, 250);
 
     // Keep the tray icon referenced for the lifetime of the app.
     app.on("before-quit", () => {
+      clearInterval(ticker);
       stopWatching?.();
       tray.destroy();
     });

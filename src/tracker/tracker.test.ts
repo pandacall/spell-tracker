@@ -5,6 +5,23 @@ import unleashedSmite from "../../fixtures/smite-unleashed-vs-bots.json";
 import unleashedTeleport from "../../fixtures/teleport-unleashed-vs-bots.json";
 import { createTracker } from "./tracker";
 
+/** The draft snapshot with one Enemy's two spells swapped for the given spell ids. */
+function withSpells(snapshot: typeof draft, championId: string, one: string, two: string): typeof draft {
+  const spell = (id: string) => ({
+    displayName: id,
+    rawDescription: `GeneratedTip_SummonerSpell_${id}_Description`,
+    rawDisplayName: `GeneratedTip_SummonerSpell_${id}_DisplayName`,
+  });
+  return {
+    ...snapshot,
+    allPlayers: snapshot.allPlayers.map((player) =>
+      player.rawChampionName === `game_character_displayname_${championId}`
+        ? { ...player, summonerSpells: { summonerSpellOne: spell(one), summonerSpellTwo: spell(two) } }
+        : player,
+    ),
+  };
+}
+
 describe("Tracker", () => {
   it("lists the five Enemies in game-feed order when a game loads", () => {
     const tracker = createTracker();
@@ -124,6 +141,164 @@ describe("Tracker", () => {
     expect(tracker.feed(spectating)).toBeUndefined();
 
     expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
+  });
+
+  it("starts a Countdown from the base cooldown when a spell is Marked", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(draft);
+
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells.map((spell) => spell.countdown)).toEqual([undefined, 300]);
+  });
+
+  it("counts down between polls and corrects itself to the game feed's clock after a pause", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+    const flashCountdown = () =>
+      tracker.overlay().rows.find((row) => row.champion.id === "Evelynn")?.spells[1].countdown;
+
+    wallMs = 10_000;
+    expect(flashCountdown()).toBe(290);
+
+    // The game was paused: 10s passed here but the game clock moved only 4s.
+    tracker.feed({ ...draft, gameData: { ...draft.gameData, gameTime: draft.gameData.gameTime + 4 } });
+    expect(flashCountdown()).toBe(296);
+
+    wallMs = 11_000;
+    expect(flashCountdown()).toBe(295);
+  });
+
+  it("never shows more than the base cooldown when a poll pulls the clock back behind a fresh Mark", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+
+    // The game is paused, so the interpolated clock runs ahead of the real one.
+    wallMs = 10_000;
+    tracker.mark("Evelynn", "SummonerFlash");
+    tracker.feed(draft);
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(300);
+  });
+
+  it("keeps the last game clock when a snapshot carries no game time", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    wallMs = 5_000;
+    const { gameTime: _gameTime, ...gameData } = draft.gameData;
+    tracker.feed({ ...draft, gameData } as unknown as typeof draft);
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(295);
+  });
+
+  it("returns a spell to ready when its Countdown reaches zero, ready to be Marked again", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+    const flashCountdown = () =>
+      tracker.overlay().rows.find((row) => row.champion.id === "Evelynn")?.spells[1].countdown;
+
+    wallMs = 299_000;
+    expect(flashCountdown()).toBe(1);
+
+    wallMs = 300_000;
+    expect(flashCountdown()).toBeUndefined();
+
+    tracker.mark("Evelynn", "SummonerFlash");
+    expect(flashCountdown()).toBe(300);
+  });
+
+  it("ignores a Mark on a spell that is already counting down", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    wallMs = 20_000;
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(280);
+  });
+
+  it("clears a Countdown, leaving the spell ready", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    tracker.clear("Evelynn", "SummonerFlash");
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells.map((spell) => spell.countdown)).toEqual([undefined, undefined]);
+  });
+
+  it.each([
+    ["SummonerFlash", 300],
+    ["SummonerDot", 180],
+    ["SummonerBarrier", 180],
+    ["SummonerHeal", 240],
+    ["SummonerExhaust", 240],
+    ["SummonerHaste", 240],
+    ["SummonerBoost", 240],
+    ["SummonerTeleport", 300],
+  ])("counts down %s from its base cooldown of %i seconds", (spellId, seconds) => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withSpells(draft, "Evelynn", spellId, "SummonerSmite"));
+
+    tracker.mark("Evelynn", spellId);
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[0].countdown).toBe(seconds);
+  });
+
+  it("shows Smite but never Marks it", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(draft);
+
+    tracker.mark("Evelynn", "SummonerSmite");
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[0]).toEqual({ id: "SummonerSmite", name: "Smite" });
+  });
+
+  it("forgets every Mark when the game ends, whether the feed goes away or reports GameEnd", () => {
+    const ended = {
+      ...draft,
+      events: { Events: [...draft.events.Events, { EventID: 99, EventName: "GameEnd", EventTime: 1500, Result: "Win" }] },
+    };
+    const flashCountdown = (tracker: ReturnType<typeof createTracker>) =>
+      tracker.overlay().rows.find((row) => row.champion.id === "Evelynn")?.spells[1].countdown;
+
+    for (const ending of [null, ended]) {
+      const tracker = createTracker({ now: () => 0 });
+      tracker.feed(draft);
+      tracker.mark("Evelynn", "SummonerFlash");
+
+      tracker.feed(ending);
+      tracker.feed(draft);
+
+      expect(flashCountdown(tracker)).toBeUndefined();
+    }
+  });
+
+  it("ignores a Mark when there is no game", () => {
+    const tracker = createTracker({ now: () => 0 });
+
+    tracker.mark("Evelynn", "SummonerFlash");
+    tracker.feed(draft);
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBeUndefined();
   });
 
   it("picks up a new game after the last one ended", () => {

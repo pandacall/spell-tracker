@@ -8,9 +8,14 @@ export interface Spell {
   name: string;
 }
 
+export interface OverlaySpell extends Spell {
+  /** Whole seconds until a Marked spell is ready again; absent when it is ready. */
+  countdown?: number;
+}
+
 export interface EnemyRow {
   champion: Champion;
-  spells: [Spell, Spell];
+  spells: [OverlaySpell, OverlaySpell];
 }
 
 export interface OverlayState {
@@ -23,6 +28,10 @@ export type TrackerSignal = "game-started" | "game-ended";
 export interface Tracker {
   /** Feed one raw game-feed snapshot, or null when there is no game to read. */
   feed(snapshot: unknown): TrackerSignal | undefined;
+  /** Mark an Enemy's spell as just used, starting its Countdown. */
+  mark(championId: string, spellId: string): void;
+  /** Clear an Enemy's spell Countdown, leaving it ready. */
+  clear(championId: string, spellId: string): void;
   overlay(): OverlayState;
 }
 
@@ -42,7 +51,7 @@ interface FeedPlayer {
 const SUMMONERS_RIFT_MAP_NUMBER = 11;
 
 interface FeedSnapshot {
-  gameData: { mapNumber: number };
+  gameData: { mapNumber: number; gameTime?: number };
   events: { Events: Array<{ EventName: string }> };
   activePlayer: { riotId: string };
   allPlayers: FeedPlayer[];
@@ -66,6 +75,19 @@ function championOf(player: FeedPlayer): Champion {
   const match = /^game_character_displayname_(.+)$/.exec(player.rawChampionName);
   return { id: match ? match[1] : player.rawChampionName, name: player.championName };
 }
+
+// Base cooldowns in seconds, by spell id; ability haste is not applied yet. Smite
+// is absent on purpose: it is shown but never Marked.
+const BASE_COOLDOWN: Record<string, number> = {
+  SummonerFlash: 300,
+  SummonerDot: 180, // Ignite
+  SummonerBarrier: 180,
+  SummonerHeal: 240,
+  SummonerExhaust: 240,
+  SummonerHaste: 240, // Ghost
+  SummonerBoost: 240, // Cleanse
+  SummonerTeleport: 300,
+};
 
 const NO_GAME: OverlayState = { visible: false, rows: [] };
 
@@ -100,8 +122,31 @@ function enemiesOf(snapshot: FeedSnapshot): EnemyRow[] | undefined {
   }
 }
 
-export function createTracker(): Tracker {
+interface MarkRecord {
+  /** Game clock seconds at the moment of the Mark. */
+  at: number;
+  cooldown: number;
+}
+
+/** Whole seconds left on a Mark at the given game time; zero or less once it has expired. */
+function remainingOf(mark: MarkRecord, game: number): number {
+  // A poll can pull the interpolated clock back behind a Mark made just before it
+  // (the game was paused), so elapsed time never goes negative. Rounded to the
+  // millisecond so float noise can't tip a whole second over.
+  const elapsed = Math.max(0, game - mark.at);
+  return Math.ceil(Math.round((mark.cooldown - elapsed) * 1000) / 1000);
+}
+
+export function createTracker(options: { now?: () => number } = {}): Tracker {
+  const now = options.now ?? (() => performance.now());
   let state: OverlayState = NO_GAME;
+  const marks = new Map<string, MarkRecord>();
+
+  // The game clock as of the latest snapshot, and when (on our own clock) we
+  // saw it, so the game time can be interpolated between polls.
+  let clock = { game: 0, seenAt: 0 };
+  const gameTime = () => clock.game + (now() - clock.seenAt) / 1000;
+  const markKey = (championId: string, spellId: string) => `${championId}:${spellId}`;
 
   return {
     feed(snapshot) {
@@ -109,6 +154,7 @@ export function createTracker(): Tracker {
       if (parsed === null || hasGameEnded(parsed)) {
         if (!state.visible) return undefined;
         state = NO_GAME;
+        marks.clear();
         return "game-ended";
       }
 
@@ -116,10 +162,41 @@ export function createTracker(): Tracker {
       if (!rows) return undefined;
       const signal = state.visible ? undefined : "game-started";
       state = { visible: true, rows };
+      // A snapshot without a game time leaves the clock as it was.
+      const reported = parsed.gameData.gameTime;
+      clock = { game: typeof reported === "number" ? reported : gameTime(), seenAt: now() };
       return signal;
     },
+    mark(championId, spellId) {
+      const cooldown = BASE_COOLDOWN[spellId];
+      if (!state.visible || cooldown === undefined) return;
+      const key = markKey(championId, spellId);
+      const existing = marks.get(key);
+      if (existing && remainingOf(existing, gameTime()) > 0) return;
+      marks.set(key, { at: gameTime(), cooldown });
+    },
+    clear(championId, spellId) {
+      marks.delete(markKey(championId, spellId));
+    },
     overlay() {
-      return state;
+      if (!state.visible) return state;
+      const game = gameTime();
+      const withCountdown = (championId: string, spell: OverlaySpell): OverlaySpell => {
+        const mark = marks.get(markKey(championId, spell.id));
+        if (!mark) return spell;
+        const remaining = remainingOf(mark, game);
+        return remaining > 0 ? { ...spell, countdown: remaining } : spell;
+      };
+      return {
+        ...state,
+        rows: state.rows.map((row) => ({
+          ...row,
+          spells: [
+            withCountdown(row.champion.id, row.spells[0]),
+            withCountdown(row.champion.id, row.spells[1]),
+          ],
+        })),
+      };
     },
   };
 }

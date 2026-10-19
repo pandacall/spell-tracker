@@ -1,5 +1,10 @@
 html, body { margin: 0; background: transparent; overflow: hidden; user-select: none; }
+img { -webkit-user-drag: none; }
 /* Ghosted so it never competes with the game for attention. */
+#handle {
+  height: 8px; margin: 3px 3px 0; border-radius: 4px; opacity: 0.5; cursor: move;
+  background: rgba(10, 14, 22, 0.45) repeating-linear-gradient(90deg, transparent 0 4px, rgba(255, 255, 255, 0.35) 4px 6px);
+}
 #rows { display: flex; flex-direction: column; gap: 3px; padding: 3px; opacity: 0.5; }
 .row {
   display: flex; align-items: center; gap: 3px; padding: 2px;
@@ -7,3 +12,9 @@ html, body { margin: 0; background: transparent; overflow: hidden; user-select: 
 }
 .row img { width: 28px; height: 28px; border-radius: 3px; display: block; }
 .row .champion { border-radius: 50%; margin-right: 3px; }
+.spell { position: relative; width: 28px; height: 28px; cursor: pointer; }
+.spell.down img { filter: brightness(0.3); }
+.countdown {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font: bold 11px/1 sans-serif; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000;
+}
