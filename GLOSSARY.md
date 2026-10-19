@@ -37,3 +37,7 @@ _Avoid_: Callout, chat message, timer message
 **Share**:
 The user's deliberate act of sending the current Share Line to team chat, separate from Marking.
 _Avoid_: Broadcast, post
+
+**Share key**:
+The system-wide key that performs a Share while a game is running. It is a setting, backtick by default.
+_Avoid_: Hotkey, trigger
