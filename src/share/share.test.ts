@@ -3,14 +3,20 @@ import { createShare, TEST_MESSAGE } from "./share";
 
 function setup(options: { gameRunning?: boolean; autoSend?: boolean } = {}) {
   const sent: string[] = [];
+  const submits: boolean[] = [];
   const state = { gameRunning: options.gameRunning ?? true };
   const share = createShare({
     settings: { shareKey: "`", autoSend: options.autoSend ?? true },
-    sender: { send: async (message) => void sent.push(message) },
+    sender: {
+      send: async (message, { submit }) => {
+        sent.push(message);
+        submits.push(submit);
+      },
+    },
     isGameRunning: () => state.gameRunning,
     keyReleased: async () => {},
   });
-  return { share, sent, state };
+  return { share, sent, submits, state };
 }
 
 describe("Share", () => {
@@ -30,12 +36,23 @@ describe("Share", () => {
     expect(sent).toEqual([]);
   });
 
-  it("does not type anything when auto-send is off", async () => {
+  it("presses Enter to send the message only when auto-send is on", async () => {
+    const on = setup({ autoSend: true });
+    const off = setup({ autoSend: false });
+
+    await on.share.press();
+    await off.share.press();
+
+    expect(on.submits).toEqual([true]);
+    expect(off.submits).toEqual([false]);
+  });
+
+  it("still types the message when auto-send is off, leaving it for the user to send", async () => {
     const { share, sent } = setup({ autoSend: false });
 
     await share.press();
 
-    expect(sent).toEqual([]);
+    expect(sent).toEqual([TEST_MESSAGE]);
   });
 
   it("sends one message per press even if the key repeats while it is being typed", async () => {

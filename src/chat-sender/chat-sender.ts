@@ -6,7 +6,8 @@ export interface Keyboard {
 }
 
 export interface ChatSender {
-  send(message: string): Promise<void>;
+  /** Opens chat and types the message; with `submit`, presses Enter to send it, otherwise leaves it typed for the user. */
+  send(message: string, options: { submit: boolean }): Promise<void>;
 }
 
 // League polls input once per frame, so a key released too quickly is missed.
@@ -28,13 +29,13 @@ export function createChatSender(deps: {
   }
 
   return {
-    async send(message) {
+    async send(message, { submit }) {
       await tap((down) => keyboard.enter(down), CHAT_BOX_OPEN_MS);
       for (let index = 0; index < message.length; index++) {
         const codeUnit = message.charCodeAt(index);
         await tap((down) => keyboard.character(codeUnit, down), GAP_BETWEEN_CHARACTERS_MS);
       }
-      await tap((down) => keyboard.enter(down), 0);
+      if (submit) await tap((down) => keyboard.enter(down), 0);
     },
   };
 }

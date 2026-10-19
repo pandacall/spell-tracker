@@ -23,12 +23,12 @@ export function createShare(deps: {
 
   return {
     async press() {
-      if (busy || !deps.isGameRunning() || !deps.settings.autoSend) return;
+      if (busy || !deps.isGameRunning()) return;
       busy = true;
       try {
         // The still-held key would otherwise reach the game or its chat box.
         await deps.keyReleased();
-        await deps.sender.send(TEST_MESSAGE);
+        await deps.sender.send(TEST_MESSAGE, { submit: deps.settings.autoSend });
       } finally {
         busy = false;
       }

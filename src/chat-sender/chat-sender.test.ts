@@ -21,7 +21,7 @@ describe("Chat Sender", () => {
   it("presses Enter, types the message, and presses Enter again", async () => {
     const { log, keyboard, sleep } = fakes();
 
-    await createChatSender({ keyboard, sleep }).send("hi");
+    await createChatSender({ keyboard, sleep }).send("hi", { submit: true });
 
     expect(log.filter((entry) => !entry.startsWith("wait"))).toEqual([
       "enter down",
@@ -38,7 +38,7 @@ describe("Chat Sender", () => {
   it("holds every key down for a moment so the game registers it", async () => {
     const { log, keyboard, sleep } = fakes();
 
-    await createChatSender({ keyboard, sleep }).send("hi");
+    await createChatSender({ keyboard, sleep }).send("hi", { submit: true });
 
     expect(log.slice(0, 4)).toEqual(["enter down", "wait some", "enter up", "wait some"]);
     expect(log.slice(4, 12)).toEqual([
@@ -57,8 +57,23 @@ describe("Chat Sender", () => {
   it("gives the chat box a moment to open before typing", async () => {
     const { log, keyboard, sleep } = fakes();
 
-    await createChatSender({ keyboard, sleep }).send("hi");
+    await createChatSender({ keyboard, sleep }).send("hi", { submit: true });
 
     expect(log.slice(0, 4)).toEqual(["enter down", "wait some", "enter up", "wait some"]);
+  });
+
+  it("types the message and stops, leaving the chat box open, when not submitting", async () => {
+    const { log, keyboard, sleep } = fakes();
+
+    await createChatSender({ keyboard, sleep }).send("hi", { submit: false });
+
+    expect(log.filter((entry) => !entry.startsWith("wait"))).toEqual([
+      "enter down",
+      "enter up",
+      "h down",
+      "h up",
+      "i down",
+      "i up",
+    ]);
   });
 });

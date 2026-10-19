@@ -3,10 +3,11 @@ import { readFileSync } from "node:fs";
 export interface Settings {
   /** A single character such as "`", or a function key "F1" to "F24". */
   shareKey: string;
+  /** True: Share also presses Enter to send. False: it types the message and stops, for the user to send. */
   autoSend: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { shareKey: "`", autoSend: true };
+export const DEFAULT_SETTINGS: Settings = { shareKey: "`", autoSend: false };
 
 /**
  * The settings in a settings file's text. A missing file (undefined), text
