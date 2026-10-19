@@ -2,8 +2,8 @@ import { BrowserWindow, screen } from "electron";
 import path from "node:path";
 import type { OverlayState } from "../tracker/tracker";
 
-const WIDTH = 220;
-const HEIGHT = 270;
+const WIDTH = 128;
+const HEIGHT = 188;
 
 export interface OverlayWindow {
   render(state: OverlayState, iconVersion: string): void;
@@ -17,8 +17,10 @@ export interface OverlayWindow {
 export function createOverlayWindow(): OverlayWindow {
   const { workArea } = screen.getPrimaryDisplay();
   const window = new BrowserWindow({
-    x: workArea.x + 24,
-    y: workArea.y + Math.round(workArea.height / 3),
+    // Well inside the screen rather than at its edge, so it lands over a windowed
+    // game as well as a borderless one. Dragging comes in a later ticket.
+    x: workArea.x + Math.round(workArea.width * 0.15),
+    y: workArea.y + Math.round(workArea.height * 0.3),
     width: WIDTH,
     height: HEIGHT,
     show: false,
