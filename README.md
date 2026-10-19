@@ -12,7 +12,7 @@ Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after edi
 { "shareKey": "`", "autoSend": true }
 ```
 
-- `shareKey`: the system-wide Share key, an [Electron accelerator](https://www.electronjs.org/docs/latest/api/accelerator) such as `F8` or a single character. It is only claimed while a game is running.
+- `shareKey`: the system-wide Share key, a single character or a function key (`F1` to `F24`). It is only watched while a game is running. The key still reaches the game (a Windows hotkey would be swallowed, but League never lets those fire), so pick one League doesn't use.
 - `autoSend`: when true, pressing the Share key types a message into team chat with simulated keystrokes (Enter, the text, Enter). For now the message is a fixed test message.
 
 ## Commands

@@ -51,33 +51,50 @@ export const windowsKeyboard: Keyboard = {
   character: (codeUnit, down) => sendKey(0, codeUnit, KEYEVENTF_UNICODE, down),
 };
 
-/** The virtual-key code of a Share key accelerator, or undefined if it isn't a single character or F1-F24. */
-function virtualKeyOf(accelerator: string): number | undefined {
-  const functionKey = /^F(\d{1,2})$/i.exec(accelerator);
+/** The virtual-key code of a Share key, or undefined if it isn't a single character or F1-F24. */
+export function virtualKeyOf(shareKey: string): number | undefined {
+  const functionKey = /^F(\d{1,2})$/i.exec(shareKey);
   if (functionKey) {
     const number = Number(functionKey[1]);
     return number >= 1 && number <= 24 ? 0x6f + number : undefined;
   }
-  if (accelerator.length === 1) {
-    const scan = VkKeyScanW(accelerator.charCodeAt(0));
+  if (shareKey.length === 1) {
+    const scan = VkKeyScanW(shareKey.charCodeAt(0));
     return scan === -1 ? undefined : scan & 0xff;
   }
   return undefined;
+}
+
+const isDown = (virtualKey: number) => (GetAsyncKeyState(virtualKey) & 0x8000) !== 0;
+
+const WATCH_POLL_MS = 15;
+
+/**
+ * Calls `onPress` once each time the key goes down. A registered Windows
+ * hotkey never fires while League has focus, so the key's state is read
+ * instead. This only reads; the key still reaches whatever window has focus.
+ * Returns a function that stops watching.
+ */
+export function watchKey(virtualKey: number, onPress: () => void): () => void {
+  let wasDown = isDown(virtualKey);
+  const timer = setInterval(() => {
+    const down = isDown(virtualKey);
+    if (down && !wasDown) onPress();
+    wasDown = down;
+  }, WATCH_POLL_MS);
+  return () => clearInterval(timer);
 }
 
 const RELEASE_POLL_MS = 10;
 const RELEASE_GIVE_UP_MS = 3000;
 
 /**
- * Resolves once the Share key is physically up (or after a few seconds, or at
- * once for a key this can't look up), so it isn't still held when the message
- * is typed.
+ * Resolves once the key is physically up (or after a few seconds), so it isn't
+ * still held when the message is typed.
  */
-export async function waitForKeyRelease(accelerator: string): Promise<void> {
-  const virtualKey = virtualKeyOf(accelerator);
-  if (virtualKey === undefined) return;
+export async function waitForKeyRelease(virtualKey: number): Promise<void> {
   const deadline = Date.now() + RELEASE_GIVE_UP_MS;
-  while ((GetAsyncKeyState(virtualKey) & 0x8000) !== 0 && Date.now() < deadline) {
+  while (isDown(virtualKey) && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, RELEASE_POLL_MS));
   }
 }

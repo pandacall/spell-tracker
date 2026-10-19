@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 
 export interface Settings {
-  /** An Electron accelerator, e.g. "`" or "F8". */
+  /** A single character such as "`", or a function key "F1" to "F24". */
   shareKey: string;
   autoSend: boolean;
 }

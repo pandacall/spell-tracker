@@ -1,4 +1,4 @@
-import { app, globalShortcut, net } from "electron";
+import { app, net } from "electron";
 import path from "node:path";
 import { createChatSender } from "../chat-sender/chat-sender";
 import { startGameFeed } from "../game-feed/game-feed";
@@ -7,7 +7,7 @@ import { createShare } from "../share/share";
 import { createTracker } from "../tracker/tracker";
 import { createOverlayWindow } from "./overlay-window";
 import { createTray } from "./tray";
-import { waitForKeyRelease, windowsKeyboard } from "./windows-input";
+import { virtualKeyOf, waitForKeyRelease, watchKey, windowsKeyboard } from "./windows-input";
 
 // Used until Data Dragon's current version can be fetched.
 let iconVersion = "15.1.1";
@@ -33,6 +33,10 @@ if (!app.requestSingleInstanceLock()) {
 
     // Read once at startup; edit the file and restart to change a setting.
     const settings = loadSettings(path.join(app.getPath("userData"), "settings.json"));
+    const shareVirtualKey = virtualKeyOf(settings.shareKey);
+    if (shareVirtualKey === undefined) {
+      console.error(`Unsupported Share key "${settings.shareKey}": use a single character or F1-F24.`);
+    }
     const share = createShare({
       settings,
       sender: createChatSender({
@@ -40,33 +44,28 @@ if (!app.requestSingleInstanceLock()) {
         sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
       }),
       isGameRunning: () => tracker.overlay().visible,
-      keyReleased: () => waitForKeyRelease(settings.shareKey),
+      keyReleased: () => (shareVirtualKey === undefined ? Promise.resolve() : waitForKeyRelease(shareVirtualKey)),
     });
 
-    // The Share key is only claimed while a game is on, so it stays usable
-    // everywhere else.
-    const claimShareKey = () => {
-      try {
-        const claimed = globalShortcut.register(settings.shareKey, () => {
-          share.press().catch((error) => console.error("Share failed:", error));
-        });
-        if (!claimed) console.error(`Could not register the Share key "${settings.shareKey}".`);
-      } catch (error) {
-        // Electron throws on a malformed accelerator; that must not break the overlay.
-        console.error(`Invalid Share key "${settings.shareKey}":`, error);
-      }
+    // The Share key is only watched while a game is on.
+    let stopWatching: (() => void) | undefined;
+    const startWatchingShareKey = () => {
+      if (shareVirtualKey === undefined) return;
+      stopWatching = watchKey(shareVirtualKey, () => {
+        share.press().catch((error) => console.error("Share failed:", error));
+      });
     };
 
     startGameFeed((snapshot) => {
       const signal = tracker.feed(snapshot);
-      if (signal === "game-started") claimShareKey();
-      if (signal === "game-ended") globalShortcut.unregister(settings.shareKey);
+      if (signal === "game-started") startWatchingShareKey();
+      if (signal === "game-ended") stopWatching?.();
       overlayWindow.render(tracker.overlay(), iconVersion);
     });
 
     // Keep the tray icon referenced for the lifetime of the app.
     app.on("before-quit", () => {
-      globalShortcut.unregisterAll();
+      stopWatching?.();
       tray.destroy();
     });
   });
