@@ -1,5 +1,4 @@
 import type { ChatSender } from "../chat-sender/chat-sender";
-import type { Settings } from "../settings/settings";
 
 export interface Share {
   /** Handle one press of the Share key. */
@@ -7,7 +6,8 @@ export interface Share {
 }
 
 export function createShare(deps: {
-  settings: Settings;
+  /** Whether to press Enter after typing; read at each press so a change applies at once. */
+  autoSend(): boolean;
   sender: ChatSender;
   /** The current Share Line; empty when no Flash is down. */
   shareLine(): string;
@@ -29,7 +29,7 @@ export function createShare(deps: {
       try {
         // The still-held key would otherwise reach the game or its chat box.
         await deps.keyReleased();
-        await deps.sender.send(line, { submit: deps.settings.autoSend });
+        await deps.sender.send(line, { submit: deps.autoSend() });
       } finally {
         busy = false;
       }

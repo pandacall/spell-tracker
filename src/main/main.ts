@@ -5,6 +5,7 @@ import { createChatSender } from "../chat-sender/chat-sender";
 import { startGameFeed } from "../game-feed/game-feed";
 import { createSettingsStore } from "../settings/settings";
 import { createShare } from "../share/share";
+import { createShareKeyWatcher } from "../share/share-key-watcher";
 import { createTracker } from "../tracker/tracker";
 import { startUpdates, type Updates } from "../updater/updater";
 import { createOverlayWindow } from "./overlay-window";
@@ -32,7 +33,7 @@ if (!app.requestSingleInstanceLock()) {
     const tracker = createTracker();
     void refreshIconVersion();
 
-    // Read once at startup; edit the file and restart to change a setting.
+    // The overlay position is read once at startup; Share reads its settings live.
     const settingsPath = path.join(app.getPath("userData"), "settings.json");
     const store = createSettingsStore(settingsPath);
     const settings = store.current();
@@ -50,29 +51,28 @@ if (!app.requestSingleInstanceLock()) {
       },
       onMoved: (position) => store.update({ overlayPosition: position }),
     });
-    const shareVirtualKey = virtualKeyOf(settings.shareKey);
-    if (shareVirtualKey === undefined) {
-      console.error(`Unsupported Share key "${settings.shareKey}": use a single character or F1-F24.`);
-    }
     const share = createShare({
-      settings,
+      autoSend: () => store.current().autoSend,
       shareLine: () => tracker.shareLine(),
       sender: createChatSender({
         keyboard: windowsKeyboard,
         sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
       }),
       isGameRunning: () => tracker.overlay().visible,
-      keyReleased: () => (shareVirtualKey === undefined ? Promise.resolve() : waitForKeyRelease(shareVirtualKey)),
+      keyReleased: () => {
+        const virtualKey = shareKeyWatcher.virtualKey();
+        return virtualKey === undefined ? Promise.resolve() : waitForKeyRelease(virtualKey);
+      },
     });
 
     // The Share key is only watched while a game is on.
-    let stopWatching: (() => void) | undefined;
-    const startWatchingShareKey = () => {
-      if (shareVirtualKey === undefined) return;
-      stopWatching = watchKey(shareVirtualKey, () => {
+    const shareKeyWatcher = createShareKeyWatcher({
+      resolve: virtualKeyOf,
+      watch: watchKey,
+      onPress: () => {
         share.press().catch((error) => console.error("Share failed:", error));
-      });
-    };
+      },
+    });
 
     // Only an installed build can update itself; `npm start` never checks.
     const updates: Updates | undefined = app.isPackaged
@@ -88,11 +88,11 @@ if (!app.requestSingleInstanceLock()) {
     startGameFeed((snapshot) => {
       const signal = tracker.feed(snapshot);
       if (signal === "game-started") {
-        startWatchingShareKey();
+        shareKeyWatcher.start(store.current().shareKey);
         updates?.gameStarted();
       }
       if (signal === "game-ended") {
-        stopWatching?.();
+        shareKeyWatcher.stop();
         updates?.gameEnded();
       }
       renderOverlay();
@@ -104,7 +104,7 @@ if (!app.requestSingleInstanceLock()) {
     // Keep the tray icon referenced for the lifetime of the app.
     app.on("before-quit", () => {
       clearInterval(ticker);
-      stopWatching?.();
+      shareKeyWatcher.stop();
       updates?.stop();
       tray.destroy();
     });

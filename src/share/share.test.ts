@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SETTINGS } from "../settings/settings";
 import { createShare } from "./share";
 
 function setup(options: { gameRunning?: boolean; autoSend?: boolean; shareLine?: string } = {}) {
   const sent: Array<{ message: string; submit: boolean }> = [];
-  const state = { gameRunning: options.gameRunning ?? true, shareLine: options.shareLine ?? "1230 mid 1440 bot" };
+  const state = {
+    gameRunning: options.gameRunning ?? true,
+    autoSend: options.autoSend ?? true,
+    shareLine: options.shareLine ?? "1230 mid 1440 bot",
+  };
   const share = createShare({
-    settings: { ...DEFAULT_SETTINGS, autoSend: options.autoSend ?? true },
+    autoSend: () => state.autoSend,
     sender: { send: async (message, { submit }) => void sent.push({ message, submit }) },
     shareLine: () => state.shareLine,
     isGameRunning: () => state.gameRunning,
@@ -48,6 +51,17 @@ describe("Share", () => {
     expect(sent).toEqual([]);
   });
 
+  it("uses auto-send as it is at the moment of the press", async () => {
+    const { share, sent, state } = setup();
+
+    state.autoSend = false;
+    await share.press();
+    state.autoSend = true;
+    await share.press();
+
+    expect(sent.map(({ submit }) => submit)).toEqual([false, true]);
+  });
+
   it("sends the Share Line as it is at the moment of the press", async () => {
     const { share, sent, state } = setup();
 
@@ -63,7 +77,7 @@ describe("Share", () => {
     const sent: string[] = [];
     let finishTyping = () => {};
     const share = createShare({
-      settings: { ...DEFAULT_SETTINGS, autoSend: true },
+      autoSend: () => true,
       sender: {
         send: (message) => {
           sent.push(message);
@@ -97,7 +111,7 @@ describe("Share", () => {
     const sent: string[] = [];
     let release = () => {};
     const share = createShare({
-      settings: { ...DEFAULT_SETTINGS, autoSend: true },
+      autoSend: () => true,
       sender: { send: async (message) => void sent.push(message) },
       shareLine: () => "1230 mid",
       isGameRunning: () => true,
