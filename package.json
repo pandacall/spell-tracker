@@ -16,6 +16,9 @@
   "build": {
     "appId": "com.pandacall.spell-tracker",
     "productName": "Spell Tracker",
+    "electronLanguages": [
+      "en-US"
+    ],
     "directories": {
       "output": "release",
       "buildResources": "build"
