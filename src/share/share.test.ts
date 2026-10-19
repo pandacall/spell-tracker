@@ -1,58 +1,67 @@
 import { describe, expect, it } from "vitest";
-import { createShare, TEST_MESSAGE } from "./share";
+import { createShare } from "./share";
 
-function setup(options: { gameRunning?: boolean; autoSend?: boolean } = {}) {
-  const sent: string[] = [];
-  const submits: boolean[] = [];
-  const state = { gameRunning: options.gameRunning ?? true };
+function setup(options: { gameRunning?: boolean; autoSend?: boolean; shareLine?: string } = {}) {
+  const sent: Array<{ message: string; submit: boolean }> = [];
+  const shown: string[] = [];
+  const state = { gameRunning: options.gameRunning ?? true, shareLine: options.shareLine ?? "1230 mid 1440 bot" };
   const share = createShare({
     settings: { shareKey: "`", autoSend: options.autoSend ?? true },
-    sender: {
-      send: async (message, { submit }) => {
-        sent.push(message);
-        submits.push(submit);
-      },
-    },
+    sender: { send: async (message, { submit }) => void sent.push({ message, submit }) },
+    shareLine: () => state.shareLine,
+    showOnOverlay: (line) => void shown.push(line),
     isGameRunning: () => state.gameRunning,
     keyReleased: async () => {},
   });
-  return { share, sent, submits, state };
+  return { share, sent, shown, state };
 }
 
 describe("Share", () => {
-  it("sends the test message to chat when the Share key is pressed in a game", async () => {
-    const { share, sent } = setup();
+  it("sends the Share Line to chat, and presses Enter to send it, when auto-send is on", async () => {
+    const { share, sent, shown } = setup({ autoSend: true });
 
     await share.press();
 
-    expect(sent).toEqual([TEST_MESSAGE]);
+    expect(sent).toEqual([{ message: "1230 mid 1440 bot", submit: true }]);
+    expect(shown).toEqual([]);
   });
 
-  it("does nothing when no game is running", async () => {
-    const { share, sent } = setup({ gameRunning: false });
+  it("shows the Share Line on the overlay and types nothing when auto-send is off", async () => {
+    const { share, sent, shown } = setup({ autoSend: false });
+
+    await share.press();
+
+    expect(shown).toEqual(["1230 mid 1440 bot"]);
+    expect(sent).toEqual([]);
+  });
+
+  it.each([true, false])("does nothing when no Flash is down (auto-send %s)", async (autoSend) => {
+    const { share, sent, shown } = setup({ autoSend, shareLine: "" });
 
     await share.press();
 
     expect(sent).toEqual([]);
+    expect(shown).toEqual([]);
   });
 
-  it("presses Enter to send the message only when auto-send is on", async () => {
-    const on = setup({ autoSend: true });
-    const off = setup({ autoSend: false });
-
-    await on.share.press();
-    await off.share.press();
-
-    expect(on.submits).toEqual([true]);
-    expect(off.submits).toEqual([false]);
-  });
-
-  it("still types the message when auto-send is off, leaving it for the user to send", async () => {
-    const { share, sent } = setup({ autoSend: false });
+  it.each([true, false])("does nothing when no game is running (auto-send %s)", async (autoSend) => {
+    const { share, sent, shown } = setup({ autoSend, gameRunning: false });
 
     await share.press();
 
-    expect(sent).toEqual([TEST_MESSAGE]);
+    expect(sent).toEqual([]);
+    expect(shown).toEqual([]);
+  });
+
+  it("sends the Share Line as it is at the moment of the press", async () => {
+    const { share, sent, state } = setup();
+
+    state.shareLine = "1230 mid";
+    await share.press();
+    state.shareLine = "1440 bot";
+    await share.press();
+
+    expect(sent.map(({ message }) => message)).toEqual(["1230 mid", "1440 bot"]);
   });
 
   it("sends one message per press even if the key repeats while it is being typed", async () => {
@@ -66,6 +75,8 @@ describe("Share", () => {
           return new Promise<void>((resolve) => (finishTyping = resolve));
         },
       },
+      shareLine: () => "1230 mid",
+      showOnOverlay: () => {},
       isGameRunning: () => true,
       keyReleased: async () => {},
     });
@@ -76,7 +87,7 @@ describe("Share", () => {
     finishTyping();
     await first;
 
-    expect(sent).toEqual([TEST_MESSAGE]);
+    expect(sent).toEqual(["1230 mid"]);
   });
 
   it("sends again on the next press once the previous message is done", async () => {
@@ -85,7 +96,7 @@ describe("Share", () => {
     await share.press();
     await share.press();
 
-    expect(sent).toEqual([TEST_MESSAGE, TEST_MESSAGE]);
+    expect(sent).toHaveLength(2);
   });
 
   it("waits for the Share key to be released before typing", async () => {
@@ -94,6 +105,8 @@ describe("Share", () => {
     const share = createShare({
       settings: { shareKey: "`", autoSend: true },
       sender: { send: async (message) => void sent.push(message) },
+      shareLine: () => "1230 mid",
+      showOnOverlay: () => {},
       isGameRunning: () => true,
       keyReleased: () => new Promise<void>((resolve) => (release = resolve)),
     });
@@ -104,6 +117,6 @@ describe("Share", () => {
 
     release();
     await pressed;
-    expect(sent).toEqual([TEST_MESSAGE]);
+    expect(sent).toEqual(["1230 mid"]);
   });
 });

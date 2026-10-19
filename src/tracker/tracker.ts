@@ -44,6 +44,8 @@ export interface Tracker {
   /** Clear an Enemy's spell Countdown, leaving it ready. */
   clear(championId: string, spellId: string): void;
   overlay(): OverlayState;
+  /** The Share Line for the Flashes that are down now; empty when none is. */
+  shareLine(): string;
 }
 
 interface FeedSpell {
@@ -100,10 +102,12 @@ function championOf(player: FeedPlayer): Champion {
   return { id: match ? match[1] : player.rawChampionName, name: player.championName };
 }
 
+const FLASH = "SummonerFlash";
+
 // Base cooldowns in seconds, by spell id; ability haste is not applied yet. Smite
 // is absent on purpose: it is shown but never Marked.
 const BASE_COOLDOWN: Record<string, number> = {
-  SummonerFlash: 300,
+  [FLASH]: 300,
   SummonerDot: 180, // Ignite
   SummonerBarrier: 180,
   SummonerHeal: 240,
@@ -184,6 +188,16 @@ function remainingOf(mark: MarkRecord, game: number): number {
   return Math.ceil(Math.round((mark.cooldown - elapsed) * 1000) / 1000);
 }
 
+/** The game clock second a Mark's spell is ready again, rounded down to 10 seconds as the Share Line shows it. */
+function readyTimeOf(mark: MarkRecord): number {
+  return Math.floor((mark.at + mark.cooldown) / 10) * 10;
+}
+
+/** A Ready Time in game clock seconds as minutes then two-digit seconds, with no colon (`930`, `1230`). */
+function formatReadyTime(seconds: number): string {
+  return `${Math.floor(seconds / 60)}${String(seconds % 60).padStart(2, "0")}`;
+}
+
 export function createTracker(options: { now?: () => number } = {}): Tracker {
   const now = options.now ?? (() => performance.now());
   let state: OverlayState = NO_GAME;
@@ -227,6 +241,22 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
     },
     clear(championId, spellId) {
       marks.delete(markKey(championId, spellId));
+    },
+    shareLine() {
+      const game = gameTime();
+      const entries: Array<{ role: Role; readyAt: number }> = [];
+      for (const row of state.rows) {
+        const hasFlash = row.spells.some((spell) => spell.id === FLASH);
+        const mark = marks.get(markKey(row.champion.id, FLASH));
+        if (hasFlash && mark && row.role && remainingOf(mark, game) > 0) {
+          entries.push({ role: row.role, readyAt: readyTimeOf(mark) });
+        }
+      }
+      // Rows are in Role order and the sort is stable, so equal Ready Times stay in Role order.
+      return entries
+        .sort((a, b) => a.readyAt - b.readyAt)
+        .map(({ role, readyAt }) => `${formatReadyTime(readyAt)} ${role}`)
+        .join(" ");
     },
     overlay() {
       if (!state.visible) return state;

@@ -1,9 +1,6 @@
 import type { ChatSender } from "../chat-sender/chat-sender";
 import type { Settings } from "../settings/settings";
 
-/** Stands in for the Share Line until it exists, to prove the Chat Sender works in game. */
-export const TEST_MESSAGE = "spell tracker test";
-
 export interface Share {
   /** Handle one press of the Share key. */
   press(): Promise<void>;
@@ -12,6 +9,10 @@ export interface Share {
 export function createShare(deps: {
   settings: Settings;
   sender: ChatSender;
+  /** The current Share Line; empty when no Flash is down. */
+  shareLine(): string;
+  /** Puts the Share Line large on the overlay for the user to type (auto-send off). */
+  showOnOverlay(line: string): void;
   isGameRunning(): boolean;
   /** Resolves once the Share key is physically up. */
   keyReleased(): Promise<void>;
@@ -24,11 +25,17 @@ export function createShare(deps: {
   return {
     async press() {
       if (busy || !deps.isGameRunning()) return;
+      const line = deps.shareLine();
+      if (line === "") return;
+      if (!deps.settings.autoSend) {
+        deps.showOnOverlay(line);
+        return;
+      }
       busy = true;
       try {
         // The still-held key would otherwise reach the game or its chat box.
         await deps.keyReleased();
-        await deps.sender.send(TEST_MESSAGE, { submit: deps.settings.autoSend });
+        await deps.sender.send(line, { submit: true });
       } finally {
         busy = false;
       }

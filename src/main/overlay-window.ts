@@ -3,11 +3,13 @@ import path from "node:path";
 import type { OverlayState } from "../tracker/tracker";
 
 const WIDTH = 128;
-const HEIGHT = 200;
+// Tall enough for the five rows and a Share Line of five entries shown large below them.
+const HEIGHT = 340;
 const DRAG_POLL_MS = 16;
 
 export interface OverlayWindow {
-  render(state: OverlayState, iconVersion: string): void;
+  /** `shareLine`, when given, is shown large below the rows. */
+  render(state: OverlayState, iconVersion: string, shareLine?: string): void;
 }
 
 export interface OverlayWindowOptions {
@@ -130,8 +132,8 @@ export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindo
   });
 
   return {
-    render(state, iconVersion) {
-      latest = JSON.stringify({ state, iconVersion });
+    render(state, iconVersion, shareLine) {
+      latest = JSON.stringify({ state, iconVersion, shareLine });
       send();
       if (state.visible && !window.isVisible()) window.showInactive();
       if (!state.visible && window.isVisible()) {

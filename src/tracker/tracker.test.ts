@@ -440,3 +440,108 @@ describe("Tracker", () => {
     expect(tracker.overlay().rows).toHaveLength(5);
   });
 });
+
+describe("Tracker Share Line", () => {
+  /** The draft snapshot with the game clock at the given seconds. */
+  const at = (gameTime: number) => ({ ...draft, gameData: { ...draft.gameData, gameTime } });
+
+  it("gives the Ready Time as Mark time plus cooldown, rounded down to 10 seconds, as minutes and seconds with no colon", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(at(931.9));
+
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    // Ready at 1231.9s on the game clock, which is 20:31.9, shown as 20:30.
+    expect(tracker.shareLine()).toBe("2030 jg");
+  });
+
+  it("writes no leading zero under 10:00 and keeps two-digit seconds", () => {
+    const tracker = createTracker({ now: () => 0 });
+    // Ready at 9:30 (570s), which is one cooldown after a Mark at 4:30 (270s).
+    tracker.feed(at(270));
+    tracker.mark("Evelynn", "SummonerFlash");
+    expect(tracker.shareLine()).toBe("930 jg");
+
+    // Ready at 12:05 (725s), one cooldown after a Mark at 7:05 (425s); rounded down, the seconds are 00.
+    const other = createTracker({ now: () => 0 });
+    other.feed(at(425));
+    other.mark("Evelynn", "SummonerFlash");
+    expect(other.shareLine()).toBe("1200 jg");
+  });
+
+  it("lists the Flashes soonest Ready Time first, joined with single spaces", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(at(270));
+    tracker.mark("Kaisa", "SummonerFlash"); // ready 9:30
+    tracker.feed(at(310));
+    tracker.mark("Evelynn", "SummonerFlash"); // ready 10:10
+    tracker.feed(at(400));
+    tracker.mark("Yone", "SummonerFlash"); // ready 11:40
+    tracker.mark("Malzahar", "SummonerFlash"); // ready 11:40
+
+    // Not Role order, and 9:30 sorts before 10:10 although "930" is the longer string.
+    expect(tracker.shareLine()).toBe("930 bot 1010 jg 1140 top 1140 mid");
+  });
+
+  it("drops an Enemy from the Share Line once their Flash is back", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(at(600));
+    tracker.mark("Kaisa", "SummonerFlash"); // ready at 900
+    wallMs = 60_000;
+    tracker.mark("Evelynn", "SummonerFlash"); // ready at 960
+
+    wallMs = 299_000;
+    expect(tracker.shareLine()).toBe("1500 bot 1600 jg");
+    wallMs = 300_000;
+    expect(tracker.shareLine()).toBe("1600 jg");
+    wallMs = 360_000;
+    expect(tracker.shareLine()).toBe("");
+  });
+
+  it("leaves out every spell but Flash", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withSpells(at(600), "Malzahar", "SummonerTeleport", "SummonerHeal"));
+
+    tracker.mark("Malzahar", "SummonerTeleport");
+    tracker.mark("Malzahar", "SummonerHeal");
+    tracker.mark("Yone", "SummonerExhaust");
+
+    expect(tracker.shareLine()).toBe("");
+  });
+
+  it("leaves out an Enemy without Flash, however they are Marked", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withSpells(at(600), "Malzahar", "SummonerTeleport", "SummonerHeal"));
+
+    tracker.mark("Malzahar", "SummonerFlash");
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    expect(tracker.shareLine()).toBe("1500 jg");
+  });
+
+  it("is empty when nothing is Marked, when a Mark is cleared, and when there is no game", () => {
+    const tracker = createTracker({ now: () => 0 });
+    expect(tracker.shareLine()).toBe("");
+
+    tracker.feed(at(600));
+    expect(tracker.shareLine()).toBe("");
+
+    tracker.mark("Evelynn", "SummonerFlash");
+    tracker.clear("Evelynn", "SummonerFlash");
+    expect(tracker.shareLine()).toBe("");
+
+    tracker.mark("Evelynn", "SummonerFlash");
+    loseFeed(tracker);
+    expect(tracker.shareLine()).toBe("");
+  });
+
+  it("leaves out Enemies that have no Role, since a Share Line entry needs one", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withPositions(at(600), { Evelynn: "", Kaisa: "BOTTOM" }));
+    tracker.mark("Kaisa", "SummonerFlash");
+
+    expect(tracker.overlay().roleSetupNeeded).toBe(true);
+    expect(tracker.shareLine()).toBe("");
+  });
+});

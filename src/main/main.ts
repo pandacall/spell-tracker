@@ -9,6 +9,9 @@ import { createOverlayWindow } from "./overlay-window";
 import { createTray } from "./tray";
 import { virtualKeyOf, waitForKeyRelease, watchKey, windowsKeyboard } from "./windows-input";
 
+// How long the Share Line stays large on the overlay when auto-send is off.
+const SHARE_LINE_SHOWN_MS = 5000;
+
 // Used until Data Dragon's current version can be fetched.
 let iconVersion = "15.1.1";
 
@@ -34,7 +37,11 @@ if (!app.requestSingleInstanceLock()) {
     const settingsPath = path.join(app.getPath("userData"), "settings.json");
     const settings = loadSettings(settingsPath);
 
-    const renderOverlay = () => overlayWindow.render(tracker.overlay(), iconVersion);
+    let shownShareLine: { text: string; until: number } | undefined;
+    const renderOverlay = () => {
+      if (shownShareLine && Date.now() >= shownShareLine.until) shownShareLine = undefined;
+      overlayWindow.render(tracker.overlay(), iconVersion, shownShareLine?.text);
+    };
     const overlayWindow = createOverlayWindow({
       position: settings.overlayPosition,
       onMark: (championId, spellId) => {
@@ -53,6 +60,11 @@ if (!app.requestSingleInstanceLock()) {
     }
     const share = createShare({
       settings,
+      shareLine: () => tracker.shareLine(),
+      showOnOverlay: (text) => {
+        shownShareLine = { text, until: Date.now() + SHARE_LINE_SHOWN_MS };
+        renderOverlay();
+      },
       sender: createChatSender({
         keyboard: windowsKeyboard,
         sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
@@ -73,7 +85,10 @@ if (!app.requestSingleInstanceLock()) {
     startGameFeed((snapshot) => {
       const signal = tracker.feed(snapshot);
       if (signal === "game-started") startWatchingShareKey();
-      if (signal === "game-ended") stopWatching?.();
+      if (signal === "game-ended") {
+        stopWatching?.();
+        shownShareLine = undefined;
+      }
       renderOverlay();
     });
 
