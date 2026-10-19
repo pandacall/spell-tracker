@@ -22,6 +22,13 @@ function withSpells(snapshot: typeof draft, championId: string, one: string, two
   };
 }
 
+/** The game feed failing five polls in a row; returns the signal the last of them gave. */
+function loseFeed(tracker: ReturnType<typeof createTracker>) {
+  let signal: ReturnType<typeof tracker.feed>;
+  for (let miss = 0; miss < 5; miss++) signal = tracker.feed(null);
+  return signal;
+}
+
 describe("Tracker", () => {
   it("lists the five Enemies in game-feed order when a game loads", () => {
     const tracker = createTracker();
@@ -101,10 +108,32 @@ describe("Tracker", () => {
 
     expect(tracker.feed(draft)).toBe("game-started");
     expect(tracker.feed(draft)).toBeUndefined();
-    expect(tracker.feed(null)).toBe("game-ended");
+    expect(loseFeed(tracker)).toBe("game-ended");
 
     expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
     expect(tracker.feed(null)).toBeUndefined();
+  });
+
+  it("rides out a few failed polls in a row, keeping the overlay and every Mark, and counts only consecutive ones", () => {
+    let wallMs = 0;
+    const tracker = createTracker({ now: () => wallMs });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+    const flashCountdown = () =>
+      tracker.overlay().rows.find((row) => row.champion.id === "Evelynn")?.spells[1].countdown;
+
+    for (let miss = 0; miss < 4; miss++) expect(tracker.feed(null)).toBeUndefined();
+    wallMs = 4_000;
+    expect(tracker.overlay().visible).toBe(true);
+    expect(flashCountdown()).toBe(296);
+
+    // A poll that gets through starts the count again.
+    tracker.feed(draft);
+    for (let miss = 0; miss < 4; miss++) expect(tracker.feed(null)).toBeUndefined();
+    expect(tracker.overlay().visible).toBe(true);
+
+    expect(tracker.feed(null)).toBe("game-ended");
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
   });
 
   it("signals the game ending once on a GameEnd event, even while the feed is still up", () => {
@@ -119,7 +148,7 @@ describe("Tracker", () => {
     expect(tracker.feed(ended)).toBe("game-ended");
     expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
     expect(tracker.feed(ended)).toBeUndefined();
-    expect(tracker.feed(null)).toBeUndefined();
+    expect(loseFeed(tracker)).toBeUndefined();
   });
 
   it("ignores snapshots it cannot make sense of, and keeps tracking afterwards", () => {
@@ -284,7 +313,8 @@ describe("Tracker", () => {
       tracker.feed(draft);
       tracker.mark("Evelynn", "SummonerFlash");
 
-      tracker.feed(ending);
+      if (ending === null) loseFeed(tracker);
+      else tracker.feed(ending);
       tracker.feed(draft);
 
       expect(flashCountdown(tracker)).toBeUndefined();
@@ -305,7 +335,7 @@ describe("Tracker", () => {
     const tracker = createTracker();
 
     tracker.feed(draft);
-    tracker.feed(null);
+    loseFeed(tracker);
 
     expect(tracker.feed(draft)).toBe("game-started");
     expect(tracker.overlay().rows).toHaveLength(5);

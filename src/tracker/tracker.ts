@@ -89,6 +89,11 @@ const BASE_COOLDOWN: Record<string, number> = {
   SummonerTeleport: 300,
 };
 
+// The feed is polled about once a second and a poll fails on any lag spike or
+// loading hitch, so only this many failures in a row mean the game is over.
+// (A GameEnd event in a snapshot ends it at once.)
+const MISSED_POLLS_BEFORE_GAME_ENDS = 5;
+
 const NO_GAME: OverlayState = { visible: false, rows: [] };
 
 function hasGameEnded(snapshot: FeedSnapshot): boolean {
@@ -141,6 +146,7 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
   const now = options.now ?? (() => performance.now());
   let state: OverlayState = NO_GAME;
   const marks = new Map<string, MarkRecord>();
+  let missedPolls = 0;
 
   // The game clock as of the latest snapshot, and when (on our own clock) we
   // saw it, so the game time can be interpolated between polls.
@@ -151,6 +157,8 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
   return {
     feed(snapshot) {
       const parsed = snapshot as FeedSnapshot | null;
+      missedPolls = parsed === null ? missedPolls + 1 : 0;
+      if (parsed === null && missedPolls < MISSED_POLLS_BEFORE_GAME_ENDS) return undefined;
       if (parsed === null || hasGameEnded(parsed)) {
         if (!state.visible) return undefined;
         state = NO_GAME;
