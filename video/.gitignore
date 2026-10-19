@@ -1,0 +1,8 @@
+node_modules/
+.venv/
+out/
+src/generated/assets.json
+# Recorded gameplay and music are large and stay local.
+public/clips/
+public/music/
+source/

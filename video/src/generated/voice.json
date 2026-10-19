@@ -1,0 +1,326 @@
+{
+  "voice": "en-US-AndrewMultilingualNeural",
+  "rate": "+8%",
+  "words": [
+    {
+      "text": "Ever",
+      "start": 0.081,
+      "end": 0.255
+    },
+    {
+      "text": "lose",
+      "start": 0.255,
+      "end": 0.428
+    },
+    {
+      "text": "track",
+      "start": 0.428,
+      "end": 0.764
+    },
+    {
+      "text": "of",
+      "start": 0.775,
+      "end": 0.833
+    },
+    {
+      "text": "who",
+      "start": 0.845,
+      "end": 1.007
+    },
+    {
+      "text": "burned",
+      "start": 1.018,
+      "end": 1.285
+    },
+    {
+      "text": "Flash",
+      "start": 1.285,
+      "end": 1.887
+    },
+    {
+      "text": "Meet",
+      "start": 2.257,
+      "end": 2.454
+    },
+    {
+      "text": "Spell",
+      "start": 2.465,
+      "end": 2.812
+    },
+    {
+      "text": "Tracker",
+      "start": 2.824,
+      "end": 3.333
+    },
+    {
+      "text": "a",
+      "start": 3.727,
+      "end": 3.75
+    },
+    {
+      "text": "lightweight",
+      "start": 3.75,
+      "end": 4.34
+    },
+    {
+      "text": "overlay",
+      "start": 4.398,
+      "end": 4.873
+    },
+    {
+      "text": "that",
+      "start": 4.884,
+      "end": 5.023
+    },
+    {
+      "text": "tracks",
+      "start": 5.023,
+      "end": 5.556
+    },
+    {
+      "text": "every",
+      "start": 5.706,
+      "end": 6.076
+    },
+    {
+      "text": "enemy",
+      "start": 6.088,
+      "end": 6.377
+    },
+    {
+      "text": "summoner",
+      "start": 6.389,
+      "end": 6.759
+    },
+    {
+      "text": "spell",
+      "start": 6.759,
+      "end": 7.176
+    },
+    {
+      "text": "Saw",
+      "start": 7.546,
+      "end": 7.685
+    },
+    {
+      "text": "them",
+      "start": 7.685,
+      "end": 7.824
+    },
+    {
+      "text": "Flash",
+      "start": 7.836,
+      "end": 8.368
+    },
+    {
+      "text": "One",
+      "start": 8.738,
+      "end": 8.947
+    },
+    {
+      "text": "click",
+      "start": 8.947,
+      "end": 9.317
+    },
+    {
+      "text": "and",
+      "start": 9.56,
+      "end": 9.606
+    },
+    {
+      "text": "the",
+      "start": 9.607,
+      "end": 9.676
+    },
+    {
+      "text": "countdown",
+      "start": 9.688,
+      "end": 10.162
+    },
+    {
+      "text": "starts",
+      "start": 10.162,
+      "end": 10.718
+    },
+    {
+      "text": "It",
+      "start": 11.076,
+      "end": 11.134
+    },
+    {
+      "text": "even",
+      "start": 11.134,
+      "end": 11.319
+    },
+    {
+      "text": "handles",
+      "start": 11.319,
+      "end": 11.759
+    },
+    {
+      "text": "Lucidity",
+      "start": 11.771,
+      "end": 12.268
+    },
+    {
+      "text": "Boots",
+      "start": 12.268,
+      "end": 12.789
+    },
+    {
+      "text": "and",
+      "start": 12.963,
+      "end": 13.079
+    },
+    {
+      "text": "Teleport",
+      "start": 13.09,
+      "end": 13.611
+    },
+    {
+      "text": "scaling",
+      "start": 13.611,
+      "end": 14.086
+    },
+    {
+      "text": "Then",
+      "start": 14.456,
+      "end": 14.664
+    },
+    {
+      "text": "hit",
+      "start": 14.664,
+      "end": 14.861
+    },
+    {
+      "text": "one",
+      "start": 14.873,
+      "end": 15.116
+    },
+    {
+      "text": "key",
+      "start": 15.116,
+      "end": 15.567
+    },
+    {
+      "text": "and",
+      "start": 15.845,
+      "end": 15.937
+    },
+    {
+      "text": "it",
+      "start": 15.938,
+      "end": 16.018
+    },
+    {
+      "text": "types",
+      "start": 16.018,
+      "end": 16.308
+    },
+    {
+      "text": "the",
+      "start": 16.308,
+      "end": 16.4
+    },
+    {
+      "text": "timers",
+      "start": 16.4,
+      "end": 16.817
+    },
+    {
+      "text": "straight",
+      "start": 16.829,
+      "end": 17.211
+    },
+    {
+      "text": "into",
+      "start": 17.222,
+      "end": 17.373
+    },
+    {
+      "text": "chat",
+      "start": 17.373,
+      "end": 17.801
+    },
+    {
+      "text": "twelve-thirty",
+      "start": 18.194,
+      "end": 18.704
+    },
+    {
+      "text": "mid",
+      "start": 18.704,
+      "end": 19.016
+    },
+    {
+      "text": "fourteen-forty",
+      "start": 19.167,
+      "end": 19.826
+    },
+    {
+      "text": "bot",
+      "start": 19.838,
+      "end": 20.197
+    },
+    {
+      "text": "Your",
+      "start": 20.556,
+      "end": 20.625
+    },
+    {
+      "text": "whole",
+      "start": 20.625,
+      "end": 20.81
+    },
+    {
+      "text": "team",
+      "start": 20.822,
+      "end": 21.088
+    },
+    {
+      "text": "knows",
+      "start": 21.088,
+      "end": 21.539
+    },
+    {
+      "text": "Now",
+      "start": 21.91,
+      "end": 22.037
+    },
+    {
+      "text": "go",
+      "start": 22.037,
+      "end": 22.164
+    },
+    {
+      "text": "punish",
+      "start": 22.176,
+      "end": 22.546
+    },
+    {
+      "text": "it",
+      "start": 22.546,
+      "end": 22.697
+    },
+    {
+      "text": "Spell",
+      "start": 23.079,
+      "end": 23.391
+    },
+    {
+      "text": "Tracker",
+      "start": 23.403,
+      "end": 23.9
+    },
+    {
+      "text": "Stop",
+      "start": 24.282,
+      "end": 24.549
+    },
+    {
+      "text": "guessing",
+      "start": 24.549,
+      "end": 24.942
+    }
+  ]
+}

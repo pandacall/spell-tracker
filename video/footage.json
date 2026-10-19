@@ -1,0 +1,14 @@
+{
+  "source": "source/kafi-ep62.mp4",
+  "url": "https://www.youtube.com/watch?v=ThLFJ7wh0gk",
+  "credit": "Gameplay: Kafi, \"Shaco & Teemo - Toxic Botlane Duo Ep 62\" (YouTube, CC BY)",
+  "gameClockOffset": 35,
+  "clips": {
+    "A": { "start": 851, "length": 3 },
+    "B": { "start": 300, "length": 6.5 },
+    "C": { "start": 544, "length": 4.5 },
+    "D": { "start": 556, "length": 4.5 },
+    "E": { "start": 562, "length": 7 },
+    "F": { "start": 721.3, "length": 3.5 }
+  }
+}

@@ -4,6 +4,10 @@ A personal Windows overlay for League of Legends (Summoner's Rift) that tracks t
 
 It only reads Riot's official Live Client Data API on `127.0.0.1:2999` (see ADR 0001).
 
+![Spell Tracker demo: Marking an enemy Flash starts its Countdown, and the Share key types the Share Line into team chat](docs/demo.gif)
+
+<sub>Gameplay: Kafi, ["Shaco & Teemo - Toxic Botlane Duo Ep 62"](https://www.youtube.com/watch?v=ThLFJ7wh0gk) (CC BY). The overlay and chat Share are composited onto the footage; the video is built in `video/`.</sub>
+
 ## Install (Windows)
 
 1. **[Download Spell-Tracker-Setup.exe](https://github.com/pandacall/spell-tracker/releases/latest/download/Spell-Tracker-Setup.exe)** and open it. If your browser says the file "isn't commonly downloaded", choose **Keep**.

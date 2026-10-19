@@ -1,0 +1,28 @@
+{
+  "name": "spell-tracker-video",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Demo video for Spell Tracker, edited in Remotion over recorded gameplay",
+  "scripts": {
+    "voice": "node scripts/voice.mjs",
+    "clips": "node scripts/clips.mjs",
+    "studio": "npm run clips && remotion studio",
+    "render": "npm run clips && npm run render:landscape && npm run render:vertical",
+    "render:landscape": "remotion render Landscape out/spell-tracker-landscape.mp4",
+    "render:vertical": "remotion render Vertical out/spell-tracker-vertical.mp4",
+    "typecheck": "npm run clips && tsc --noEmit",
+    "cut": "node scripts/cut.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.536",
+    "@remotion/google-fonts": "^4.0.536",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.536"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^18.3.31",
+    "typescript": "^5.9.3"
+  }
+}
