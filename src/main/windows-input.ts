@@ -2,6 +2,7 @@
 // this CommonJS build loads.
 import type KoffiModule from "koffi" with { "resolution-mode": "import" };
 import type { Keyboard } from "../chat-sender/chat-sender";
+import { parseShareKey } from "../share/share-key";
 
 const koffi = require("koffi") as typeof KoffiModule;
 
@@ -32,6 +33,10 @@ const user32 = koffi.load("user32.dll");
 const SendInput = user32.func("uint32 __stdcall SendInput(uint32 cInputs, INPUT *pInputs, int cbSize)");
 const GetAsyncKeyState = user32.func("int16 __stdcall GetAsyncKeyState(int vKey)");
 const VkKeyScanW = user32.func("int16 __stdcall VkKeyScanW(uint16 ch)");
+const MapVirtualKeyExW = user32.func("uint32 __stdcall MapVirtualKeyExW(uint32 uCode, uint32 uMapType, intptr dwhkl)");
+const GetKeyboardLayout = user32.func("intptr __stdcall GetKeyboardLayout(uint32 idThread)");
+const GetForegroundWindow = user32.func("intptr __stdcall GetForegroundWindow()");
+const GetWindowThreadProcessId = user32.func("uint32 __stdcall GetWindowThreadProcessId(intptr hWnd, uint32 *lpdwProcessId)");
 
 const INPUT_KEYBOARD = 1;
 const KEYEVENTF_KEYUP = 0x0002;
@@ -51,18 +56,49 @@ export const windowsKeyboard: Keyboard = {
   character: (codeUnit, down) => sendKey(0, codeUnit, KEYEVENTF_UNICODE, down),
 };
 
-/** The virtual-key code of a Share key, or undefined if it isn't a single character or F1-F24. */
+const MAPVK_VK_TO_CHAR = 2;
+const MAPVK_VSC_TO_VK_EX = 3;
+const CHAR_MASK = 0x7fffffff; // clears bit 31, which marks a dead key
+
+// The Share key is watched from game start, when League is the foreground
+// window, so its layout is the one the player is typing on.
+const foregroundLayout = () => GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), null));
+
+/** The virtual-key code of a Share key, or undefined if it can't be resolved. */
 export function virtualKeyOf(shareKey: string): number | undefined {
-  const functionKey = /^F(\d{1,2})$/i.exec(shareKey);
-  if (functionKey) {
-    const number = Number(functionKey[1]);
-    return number >= 1 && number <= 24 ? 0x6f + number : undefined;
+  const key = parseShareKey(shareKey);
+  switch (key?.kind) {
+    case "function":
+      return 0x6f + key.number;
+    case "character": {
+      const scan = VkKeyScanW(key.character.charCodeAt(0));
+      return scan === -1 ? undefined : scan & 0xff;
+    }
+    case "scan": {
+      const virtualKey = MapVirtualKeyExW(key.scanCode, MAPVK_VSC_TO_VK_EX, foregroundLayout());
+      return virtualKey === 0 ? undefined : virtualKey;
+    }
+    default:
+      return undefined;
   }
-  if (shareKey.length === 1) {
-    const scan = VkKeyScanW(shareKey.charCodeAt(0));
-    return scan === -1 ? undefined : scan & 0xff;
+}
+
+/** What the Share key is called on the keyboard in use, or undefined if the key is unusable. */
+export function shareKeyLabel(shareKey: string): string | undefined {
+  const key = parseShareKey(shareKey);
+  const virtualKey = virtualKeyOf(shareKey);
+  if (!key || virtualKey === undefined) return undefined;
+  switch (key.kind) {
+    case "function":
+      return `F${key.number}`;
+    case "character":
+      return key.character.toUpperCase();
+    case "scan": {
+      // A dead key still reports its character in the low bits.
+      const character = MapVirtualKeyExW(virtualKey, MAPVK_VK_TO_CHAR, foregroundLayout()) & CHAR_MASK;
+      return character === 0 ? `Key ${key.scanCode}` : String.fromCharCode(character).toUpperCase();
+    }
   }
-  return undefined;
 }
 
 const isDown = (virtualKey: number) => (GetAsyncKeyState(virtualKey) & 0x8000) !== 0;
