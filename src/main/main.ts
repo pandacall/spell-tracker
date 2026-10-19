@@ -1,10 +1,12 @@
 import { app, net } from "electron";
+import { autoUpdater } from "electron-updater";
 import path from "node:path";
 import { createChatSender } from "../chat-sender/chat-sender";
 import { startGameFeed } from "../game-feed/game-feed";
 import { loadSettings, saveOverlayPosition } from "../settings/settings";
 import { createShare } from "../share/share";
 import { createTracker } from "../tracker/tracker";
+import { startUpdates, type Updates } from "../updater/updater";
 import { createOverlayWindow } from "./overlay-window";
 import { createTray } from "./tray";
 import { virtualKeyOf, waitForKeyRelease, watchKey, windowsKeyboard } from "./windows-input";
@@ -71,10 +73,27 @@ if (!app.requestSingleInstanceLock()) {
       });
     };
 
+    // Only an installed build can update itself; `npm start` never checks.
+    const updates: Updates | undefined = app.isPackaged
+      ? startUpdates({
+          source: autoUpdater,
+          isGameRunning: () => tracker.overlay().visible,
+          offerRestart: tray.offerRestart,
+          announce: () =>
+            tray.notify("Spell Tracker update ready", "It installs when you exit, or right-click the tray icon to restart now."),
+        })
+      : undefined;
+
     startGameFeed((snapshot) => {
       const signal = tracker.feed(snapshot);
-      if (signal === "game-started") startWatchingShareKey();
-      if (signal === "game-ended") stopWatching?.();
+      if (signal === "game-started") {
+        startWatchingShareKey();
+        updates?.gameStarted();
+      }
+      if (signal === "game-ended") {
+        stopWatching?.();
+        updates?.gameEnded();
+      }
       renderOverlay();
     });
 
@@ -85,6 +104,7 @@ if (!app.requestSingleInstanceLock()) {
     app.on("before-quit", () => {
       clearInterval(ticker);
       stopWatching?.();
+      updates?.stop();
       tray.destroy();
     });
   });

@@ -18,7 +18,7 @@ Using it:
 - Press **`** (the key under Esc) to type the enemies' Flash timers into chat, then press Enter to send.
 - If you can't see the overlay in game, set League's **Window Mode** to **Borderless** (Settings → Video).
 
-To update, download and run the installer again. To uninstall, use Windows **Settings → Apps → Spell Tracker**.
+Spell Tracker updates itself: it quietly downloads new versions in the background (never during a game) and installs them when you exit. When one is ready, the tray icon's menu also offers **Restart to update**. To uninstall, use Windows **Settings → Apps → Spell Tracker**.
 
 ## Settings
 
@@ -44,10 +44,10 @@ Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after edi
 
 ## Making a release
 
-Bump `version` in `package.json`, run `npm run dist`, then attach the installer to a new GitHub release:
+Bump `version` in `package.json` (installed copies only update to a higher version), run `npm run dist`, then attach all three files from `release/` to a new GitHub release. The tag must be `v` plus that version:
 
 ```bash
-gh release create v0.1.0 release/Spell-Tracker-Setup.exe --title "Spell Tracker 0.1.0" --notes "Download Spell-Tracker-Setup.exe below and open it."
+gh release create v0.2.0 release/Spell-Tracker-Setup.exe release/Spell-Tracker-Setup.exe.blockmap release/latest.yml --title "Spell Tracker 0.2.0" --notes "Download Spell-Tracker-Setup.exe below and open it."
 ```
 
-The download link in Install always points at the newest release, so friends' links never go stale.
+Installed copies read `latest.yml` from the newest release to find updates, and use the `.blockmap` to download only what changed. The download link in Install always points at the newest release, so friends' links never go stale.

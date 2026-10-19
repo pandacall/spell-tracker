@@ -11,7 +11,7 @@
     "start": "npm run build && electron .",
     "capture": "npm run build && node dist/capture/capture.js",
     "shortcut": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1",
-    "dist": "npm run build && electron-builder --win"
+    "dist": "npm run build && electron-builder --win --publish never"
   },
   "build": {
     "appId": "com.pandacall.spell-tracker",
@@ -37,6 +37,11 @@
       "shortcutName": "Spell Tracker",
       "runAfterFinish": true,
       "artifactName": "Spell-Tracker-Setup.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "pandacall",
+      "repo": "spell-tracker"
     }
   },
   "devDependencies": {
@@ -47,6 +52,7 @@
     "vitest": "^5.0.5"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "koffi": "^3.3.3"
   }
 }

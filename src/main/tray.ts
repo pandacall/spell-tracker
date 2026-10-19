@@ -11,9 +11,28 @@ function trayIcon() {
   return nativeImage.createFromBitmap(bitmap, { width: SIZE, height: SIZE });
 }
 
-export function createTray(): Tray {
+export interface AppTray {
+  /** Show "Restart to update" running `restart`, or hide it when `undefined`. */
+  offerRestart(restart: (() => void) | undefined): void;
+  /** A Windows notification from the tray icon. */
+  notify(title: string, content: string): void;
+  destroy(): void;
+}
+
+export function createTray(): AppTray {
   const tray = new Tray(trayIcon());
   tray.setToolTip("Spell Tracker");
-  tray.setContextMenu(Menu.buildFromTemplate([{ label: "Exit", click: () => app.quit() }]));
-  return tray;
+  const setMenu = (restart: (() => void) | undefined) =>
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        ...(restart ? [{ label: "Restart to update", click: restart }, { type: "separator" as const }] : []),
+        { label: "Exit", click: () => app.quit() },
+      ]),
+    );
+  setMenu(undefined);
+  return {
+    offerRestart: setMenu,
+    notify: (title, content) => tray.displayBalloon({ title, content }),
+    destroy: () => tray.destroy(),
+  };
 }
