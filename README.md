@@ -22,20 +22,27 @@ Spell Tracker updates itself: it quietly downloads new versions in the backgroun
 
 ## Settings
 
-Optional file `%APPDATA%\spell-tracker\settings.json` (restart the app after editing; a missing file means the defaults):
+Right-click the tray icon → **Settings**, or click the tray icon. The window sets the Share key (click **Change** and press the key you want), whether Share also sends the message, and the overlay's size, opacity and position. Outside a game, **Show sample overlay** shows the overlay with made-up Enemies so you can adjust it and drag it into place. Changes apply right away.
+
+Everything is saved in `%APPDATA%\spell-tracker\settings.json`, which you can also edit by hand (restart the app after editing; a missing file means the defaults):
 
 ```json
-{ "shareKey": "`", "autoSend": false }
+{ "shareKey": "`", "autoSend": false, "overlaySize": 100, "overlayOpacity": 50 }
 ```
 
-- `shareKey`: the system-wide Share key, a single character or a function key (`F1` to `F24`). It is only watched while a game is running. The key still reaches the game (a Windows hotkey would be swallowed, but League never lets those fire), so pick one League doesn't use.
+- `shareKey`: the system-wide Share key, a single character, a function key (`F1` to `F24`), or `scan:` and a keyboard scan code (e.g. `scan:41`, the key under Esc), which is what the Settings window records. It is only watched while a game is running. The key still reaches the game (a Windows hotkey would be swallowed, but League never lets those fire), so pick one League doesn't use.
 - `autoSend` (default `false`): what the Share key does with the Share Line (every Enemy whose Flash is down, e.g. `1230 mid 1440 bot`). It presses Enter to open chat and types the Share Line with simulated keystrokes, then stops so you can send it (press Enter) or edit it yourself. When `true` it also presses Enter at the end to send it. With no Flash down the Share key does nothing.
+- `overlaySize` (default `100`): the overlay's size as a percent, from `75` to `150`.
+- `overlayOpacity` (default `50`): how solid the overlay is drawn as a percent, from `20` to `100`.
+- `overlayPosition`: where the overlay was last dragged to. The app writes it; Reset position in Settings removes it.
+
+Unknown keys in the file are left alone. If the file isn't a JSON object (for example after a typo) when the app saves a setting, it is renamed to `settings.broken.json` and a fresh file is written.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `npm start` | Build and launch the app (tray icon with Exit; overlay appears when a game loads) |
+| `npm start` | Build and launch the app (tray icon with Settings and Exit; overlay appears when a game loads) |
 | `npm run shortcut` | Build and put a "Spell Tracker" shortcut on the desktop (does not start with Windows) |
 | `npm test` | Run the tests (Vitest) |
 | `npm run typecheck` | Typecheck source and tests |

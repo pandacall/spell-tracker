@@ -41,3 +41,9 @@ _Avoid_: Broadcast, post
 **Share key**:
 The system-wide key that performs a Share while a game is running. It is a setting, backtick by default.
 _Avoid_: Hotkey, trigger
+
+### Overlay
+
+**Sample overlay**:
+The overlay filled with made-up Enemies, shown from Settings outside a game so its size, opacity and position can be adjusted.
+_Avoid_: Preview, demo

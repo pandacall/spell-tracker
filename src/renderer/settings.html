@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'" />
+    <title>Spell Tracker settings</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <section>
+      <h2>Share key</h2>
+      <div class="line">
+        <kbd id="share-key"></kbd>
+        <button id="change">Change</button>
+      </div>
+      <p id="share-help" class="help"></p>
+      <p id="share-message" class="message" hidden></p>
+    </section>
+    <section>
+      <label class="line heading"><input type="checkbox" id="auto-send" />Send automatically</label>
+      <p id="auto-send-help" class="help"></p>
+      <p class="help">Teammates see <code>1230 mid 1440 bot</code></p>
+    </section>
+    <section>
+      <div class="line">
+        <h2>Overlay</h2>
+        <button id="reset-position">Reset position</button>
+      </div>
+      <label class="slider">Size <input type="range" id="size" min="75" max="150" step="5" /><output id="size-value"></output></label>
+      <label class="slider">Opacity <input type="range" id="opacity" min="20" max="100" step="5" /><output id="opacity-value"></output></label>
+      <button id="sample" hidden>Show sample overlay</button>
+    </section>
+    <footer>
+      <span id="version"></span>
+      <span>Changes apply right away</span>
+    </footer>
+    <script src="settings-renderer.js"></script>
+  </body>
+</html>

@@ -16,8 +16,8 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = { shareKey: "`", autoSend: false, overlaySize: 100, overlayOpacity: 50 };
 
-const OVERLAY_SIZE_RANGE = { min: 75, max: 150 };
-const OVERLAY_OPACITY_RANGE = { min: 20, max: 100 };
+export const OVERLAY_SIZE_RANGE = { min: 75, max: 150 };
+export const OVERLAY_OPACITY_RANGE = { min: 20, max: 100 };
 
 /** A finite number clamped into the range and rounded to an integer; anything else is the fallback. */
 function percent(value: unknown, range: { min: number; max: number }, fallback: number): number {

@@ -1,0 +1,35 @@
+/* Plain and dark like the overlay's rows. The window is a fixed size (see settings-window.ts). */
+:root { color-scheme: dark; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body {
+  display: flex; flex-direction: column; box-sizing: border-box; padding: 0 18px;
+  background: #0a0e16; color: #d7dbe3; font: 13px/1.4 "Segoe UI", system-ui, sans-serif; user-select: none;
+}
+section { padding: 14px 0; }
+section + section, footer { border-top: 1px solid rgba(255, 255, 255, 0.09); }
+h2 { margin: 0 0 10px; font-size: 13px; }
+h2, .heading { font-weight: 600; }
+.line.heading { gap: 8px; }
+p { margin: 8px 0 0; }
+.help, footer { color: #8b93a3; font-size: 12px; }
+.message.error { color: #ef7b70; }
+.message.warning { color: #e3b35a; }
+.line { display: flex; align-items: center; gap: 10px; }
+.line h2 { margin: 0; flex: 1; }
+button {
+  font: inherit; color: inherit; background: none; padding: 3px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px;
+}
+button:hover { background: rgba(255, 255, 255, 0.06); }
+kbd {
+  min-width: 22px; padding: 2px 9px; text-align: center; font: 600 14px/1.5 Consolas, monospace;
+  border: 1px solid rgba(255, 255, 255, 0.28); border-bottom-width: 3px; border-radius: 5px;
+}
+kbd.recording { color: #8b93a3; font-weight: normal; border-color: #2c8ad8; }
+code { font-family: Consolas, monospace; color: #d7dbe3; }
+input { margin: 0; accent-color: #2c8ad8; }
+.slider { display: grid; grid-template-columns: 60px 1fr 44px; align-items: center; margin-top: 10px; }
+output { text-align: right; font-variant-numeric: tabular-nums; }
+#sample { margin-top: 14px; }
+footer { margin-top: auto; display: flex; justify-content: space-between; padding: 10px 0 12px; }
+[hidden] { display: none !important; }

@@ -19,13 +19,16 @@ export interface AppTray {
   destroy(): void;
 }
 
-export function createTray(): AppTray {
+/** The tray icon; clicking it, or its menu's "Settings", calls `openSettings`. */
+export function createTray(options: { openSettings(): void }): AppTray {
   const tray = new Tray(trayIcon());
   tray.setToolTip("Spell Tracker");
+  tray.on("click", () => options.openSettings());
   const setMenu = (restart: (() => void) | undefined) =>
     tray.setContextMenu(
       Menu.buildFromTemplate([
         ...(restart ? [{ label: "Restart to update", click: restart }, { type: "separator" as const }] : []),
+        { label: "Settings", click: () => options.openSettings() },
         { label: "Exit", click: () => app.quit() },
       ]),
     );
