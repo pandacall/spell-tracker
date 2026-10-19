@@ -6,8 +6,6 @@ import unleashedSmite from "../../fixtures/smite-unleashed-vs-bots.json";
 import unleashedTeleport from "../../fixtures/teleport-unleashed-vs-bots.json";
 import { createTracker } from "./tracker";
 
-const NO_GAME = { visible: false, rows: [], roleSetupNeeded: false };
-
 /** The draft snapshot with one Enemy's two spells swapped for the given spell ids. */
 function withSpells(snapshot: typeof draft, championId: string, one: string, two: string): typeof draft {
   const spell = (id: string) => ({
@@ -25,17 +23,6 @@ function withSpells(snapshot: typeof draft, championId: string, one: string, two
   };
 }
 
-/** The draft snapshot with the given Enemies' feed positions replaced, keyed by champion id. */
-function withPositions(snapshot: typeof draft, positions: Record<string, string>): typeof draft {
-  return {
-    ...snapshot,
-    allPlayers: snapshot.allPlayers.map((player) => {
-      const championId = player.rawChampionName.replace("game_character_displayname_", "");
-      return Object.hasOwn(positions, championId) ? { ...player, position: positions[championId] } : player;
-    }),
-  };
-}
-
 /** The game feed failing five polls in a row; returns the signal the last of them gave. */
 function loseFeed(tracker: ReturnType<typeof createTracker>) {
   let signal: ReturnType<typeof tracker.feed>;
@@ -44,7 +31,7 @@ function loseFeed(tracker: ReturnType<typeof createTracker>) {
 }
 
 describe("Tracker", () => {
-  it("lists the five Enemies, each with its Role, when a game loads", () => {
+  it("lists the five Enemies in game-feed order when a game loads", () => {
     const tracker = createTracker();
 
     tracker.feed(draft);
@@ -59,7 +46,6 @@ describe("Tracker", () => {
       "Taric",
     ]);
     expect(overlay.rows[1]).toEqual({
-      role: "jg",
       champion: { id: "Evelynn", name: "Evelynn" },
       spells: [
         { id: "SummonerSmite", name: "Smite" },
@@ -68,85 +54,17 @@ describe("Tracker", () => {
     });
   });
 
-  it("orders the Enemies top, jg, mid, bot, sup whatever order the game feed lists them in", () => {
-    const tracker = createTracker();
-
-    tracker.feed(
-      withPositions(draft, {
-        Yone: "UTILITY",
-        Evelynn: "BOTTOM",
-        Malzahar: "MIDDLE",
-        Kaisa: "JUNGLE",
-        Taric: "TOP",
-      }),
-    );
-
-    const { rows, roleSetupNeeded } = tracker.overlay();
-    expect(rows.map((row) => [row.role, row.champion.name])).toEqual([
-      ["top", "Taric"],
-      ["jg", "Kai'Sa"],
-      ["mid", "Malzahar"],
-      ["bot", "Evelynn"],
-      ["sup", "Yone"],
-    ]);
-    expect(roleSetupNeeded).toBe(false);
-  });
-
-  it("reports that Role setup is needed and keeps game-feed order when positions are missing", () => {
-    const tracker = createTracker();
-
-    // The feed reports NONE (or nothing) when it cannot place a player, as in blind pick.
-    tracker.feed(withPositions(draft, { Yone: "NONE", Evelynn: "", Malzahar: "NONE", Kaisa: "NONE", Taric: "NONE" }));
-
-    const { rows, roleSetupNeeded } = tracker.overlay();
-    expect(roleSetupNeeded).toBe(true);
-    expect(rows.map((row) => row.champion.name)).toEqual(["Yone", "Evelynn", "Malzahar", "Kai'Sa", "Taric"]);
-    expect(rows.map((row) => row.role)).toEqual([undefined, undefined, undefined, undefined, undefined]);
-  });
-
-  it("reports that Role setup is needed when the feed gives no position at all", () => {
-    const tracker = createTracker();
-    const noPositions = structuredClone(draft);
-    for (const player of noPositions.allPlayers) delete (player as { position?: string }).position;
-
-    tracker.feed(noPositions);
-
-    expect(tracker.overlay().roleSetupNeeded).toBe(true);
-    expect(tracker.overlay().rows.map((row) => row.champion.name)).toEqual(["Yone", "Evelynn", "Malzahar", "Kai'Sa", "Taric"]);
-  });
-
-  it("reports that Role setup is needed when only some Enemies have a position", () => {
-    const tracker = createTracker();
-
-    tracker.feed(withPositions(draft, { Taric: "NONE" }));
-
-    const { rows, roleSetupNeeded } = tracker.overlay();
-    expect(roleSetupNeeded).toBe(true);
-    expect(rows.map((row) => row.champion.name)).toEqual(["Yone", "Evelynn", "Malzahar", "Kai'Sa", "Taric"]);
-    expect(rows.map((row) => row.role)).toEqual([undefined, undefined, undefined, undefined, undefined]);
-  });
-
-  it("reports that Role setup is needed when two Enemies share a position", () => {
-    const tracker = createTracker();
-
-    tracker.feed(withPositions(draft, { Taric: "JUNGLE" }));
-
-    const { rows, roleSetupNeeded } = tracker.overlay();
-    expect(roleSetupNeeded).toBe(true);
-    expect(rows.map((row) => row.role)).toEqual([undefined, undefined, undefined, undefined, undefined]);
-  });
-
-  it("lists the bot Enemies of a custom game from the other team, in Role order", () => {
+  it("lists the bot Enemies of a custom game from the other team", () => {
     const tracker = createTracker();
 
     tracker.feed(customVsBots);
 
     expect(tracker.overlay().rows.map((row) => row.champion.name)).toEqual([
-      "Mordekaiser",
-      "Karthus",
       "Vex",
-      "Jinx",
       "Leona",
+      "Jinx",
+      "Karthus",
+      "Mordekaiser",
     ]);
   });
 
@@ -199,7 +117,7 @@ describe("Tracker", () => {
 
     tracker.feed(aram);
 
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
   });
 
   it("signals the game ending and resets the overlay when the game feed goes away", () => {
@@ -209,7 +127,7 @@ describe("Tracker", () => {
     expect(tracker.feed(draft)).toBeUndefined();
     expect(loseFeed(tracker)).toBe("game-ended");
 
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
     expect(tracker.feed(null)).toBeUndefined();
   });
 
@@ -232,7 +150,7 @@ describe("Tracker", () => {
     expect(tracker.overlay().visible).toBe(true);
 
     expect(tracker.feed(null)).toBe("game-ended");
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
   });
 
   it("signals the game ending once on a GameEnd event, even while the feed is still up", () => {
@@ -245,7 +163,7 @@ describe("Tracker", () => {
     tracker.feed(draft);
 
     expect(tracker.feed(ended)).toBe("game-ended");
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
     expect(tracker.feed(ended)).toBeUndefined();
     expect(loseFeed(tracker)).toBeUndefined();
   });
@@ -255,7 +173,7 @@ describe("Tracker", () => {
 
     expect(tracker.feed({})).toBeUndefined();
     expect(tracker.feed({ ...draft, allPlayers: [] })).toBeUndefined();
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
 
     expect(tracker.feed(draft)).toBe("game-started");
     expect(tracker.feed({})).toBeUndefined();
@@ -268,7 +186,7 @@ describe("Tracker", () => {
 
     expect(tracker.feed(spectating)).toBeUndefined();
 
-    expect(tracker.overlay()).toEqual(NO_GAME);
+    expect(tracker.overlay()).toEqual({ visible: false, rows: [] });
   });
 
   it("starts a Countdown from the base cooldown when a spell is Marked", () => {
