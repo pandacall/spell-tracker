@@ -41,6 +41,7 @@ if (!app.requestSingleInstanceLock()) {
     const renderOverlay = () => overlayWindow.render(tracker.overlay(), iconVersion);
     const overlayWindow = createOverlayWindow({
       position: settings.overlayPosition,
+      appearance: { size: settings.overlaySize, opacity: settings.overlayOpacity },
       onMark: (championId, spellId) => {
         tracker.mark(championId, spellId);
         renderOverlay();

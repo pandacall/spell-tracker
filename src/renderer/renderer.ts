@@ -6,6 +6,7 @@ interface RendererPayload { state: { visible: boolean; rows: RendererRow[] }; ic
 declare const overlayApi: {
   onState(listener: (payload: RendererPayload) => void): void;
   onReset(listener: () => void): void;
+  onAppearance(listener: (appearance: { size: number; opacity: number }) => void): void;
   setInteractive(interactive: boolean): void;
   mark(championId: string, spellId: string): void;
   clear(championId: string, spellId: string): void;
@@ -59,6 +60,13 @@ overlayApi.onState(({ state, iconVersion }) => {
       return element;
     }),
   );
+});
+
+// CSS zoom rather than the page's zoom factor, which Chromium shares across
+// every window on the same origin and would resize the settings window too.
+overlayApi.onAppearance(({ size, opacity }) => {
+  document.body.style.zoom = String(size / 100);
+  document.documentElement.style.setProperty("--overlay-opacity", String(opacity / 100));
 });
 
 // The window ignores the mouse so clicks reach the game; it asks for them back

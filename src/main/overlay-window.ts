@@ -6,22 +6,47 @@ const WIDTH = 128;
 const HEIGHT = 200;
 const DRAG_POLL_MS = 16;
 
+/** Both are percents: size scales the whole overlay, opacity is how solid it is drawn. */
+export interface OverlayAppearance {
+  size: number;
+  opacity: number;
+}
+
 export interface OverlayWindow {
   render(state: OverlayState, iconVersion: string): void;
+  setAppearance(appearance: OverlayAppearance): void;
+  /** Moves the overlay back to its default spot. The caller clears any saved position. */
+  resetPosition(): void;
 }
 
 export interface OverlayWindowOptions {
   /** Where the user last left the overlay; the default spot is used when absent or off every screen. */
   position?: { x: number; y: number };
+  appearance: OverlayAppearance;
   onMark(championId: string, spellId: string): void;
   onClear(championId: string, spellId: string): void;
   /** The user finished dragging the overlay to here. */
   onMoved(position: { x: number; y: number }): void;
 }
 
+/** The overlay's window size at a size percent. */
+function sizeAt(size: number): { width: number; height: number } {
+  const scale = size / 100;
+  return { width: Math.ceil(WIDTH * scale), height: Math.ceil(HEIGHT * scale) };
+}
+
+/**
+ * The default sits well inside the screen rather than at its edge, so it lands
+ * over a windowed game as well as a borderless one.
+ */
+function defaultPosition(): { x: number; y: number } {
+  const { workArea } = screen.getPrimaryDisplay();
+  return { x: workArea.x + Math.round(workArea.width * 0.15), y: workArea.y + Math.round(workArea.height * 0.3) };
+}
+
 /** True when the overlay's drag handle would be on a connected display. */
-function isOnAScreen(position: { x: number; y: number }): boolean {
-  const handle = { x: position.x + WIDTH / 2, y: position.y + 4 };
+function isOnAScreen(position: { x: number; y: number }, width: number): boolean {
+  const handle = { x: position.x + width / 2, y: position.y + 4 };
   return screen.getAllDisplays().some(({ bounds }) => {
     return handle.x >= bounds.x && handle.x < bounds.x + bounds.width && handle.y >= bounds.y && handle.y < bounds.y + bounds.height;
   });
@@ -33,18 +58,14 @@ function isOnAScreen(position: { x: number; y: number }): boolean {
  * drag handle. Hidden until the Tracker says a game is on.
  */
 export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindow {
-  const { workArea } = screen.getPrimaryDisplay();
-  // The default sits well inside the screen rather than at its edge, so it lands
-  // over a windowed game as well as a borderless one.
-  const start =
-    options.position && isOnAScreen(options.position)
-      ? options.position
-      : { x: workArea.x + Math.round(workArea.width * 0.15), y: workArea.y + Math.round(workArea.height * 0.3) };
+  let appearance = options.appearance;
+  let { width, height } = sizeAt(appearance.size);
+  const start = options.position && isOnAScreen(options.position, width) ? options.position : defaultPosition();
   const window = new BrowserWindow({
     x: start.x,
     y: start.y,
-    width: WIDTH,
-    height: HEIGHT,
+    width,
+    height,
     show: false,
     frame: false,
     transparent: true,
@@ -104,8 +125,8 @@ export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindo
       window.setBounds({
         x: origin.x + cursor.x - grabbed.x,
         y: origin.y + cursor.y - grabbed.y,
-        width: WIDTH,
-        height: HEIGHT,
+        width,
+        height,
       });
     }, DRAG_POLL_MS);
   });
@@ -124,9 +145,14 @@ export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindo
       window.webContents.send("overlay-state", JSON.parse(latest));
     }
   };
+  // Appearance follows the same rule: the latest is re-sent once the page has loaded.
+  const sendAppearance = () => {
+    if (loaded) window.webContents.send("overlay-appearance", appearance);
+  };
   window.webContents.on("did-finish-load", () => {
     loaded = true;
     send();
+    sendAppearance();
   });
 
   return {
@@ -141,6 +167,17 @@ export function createOverlayWindow(options: OverlayWindowOptions): OverlayWindo
         clickThrough();
         window.webContents.send("overlay-reset");
       }
+    },
+    setAppearance(next) {
+      appearance = next;
+      ({ width, height } = sizeAt(next.size));
+      const { x, y } = window.getBounds();
+      window.setBounds({ x, y, width, height });
+      sendAppearance();
+    },
+    resetPosition() {
+      const { x, y } = defaultPosition();
+      window.setBounds({ x, y, width, height });
     },
   };
 }

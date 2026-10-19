@@ -8,6 +8,10 @@ contextBridge.exposeInMainWorld("overlayApi", {
   onReset(listener: () => void) {
     ipcRenderer.on("overlay-reset", () => listener());
   },
+  /** Size and opacity, both percents; sent on load and whenever the settings change. */
+  onAppearance(listener: (appearance: { size: number; opacity: number }) => void) {
+    ipcRenderer.on("overlay-appearance", (_event, appearance) => listener(appearance));
+  },
   /** True while the pointer is over something clickable; false lets clicks through to the game. */
   setInteractive(interactive: boolean) {
     ipcRenderer.send("overlay-interactive", interactive);

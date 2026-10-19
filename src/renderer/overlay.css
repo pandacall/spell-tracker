@@ -2,10 +2,10 @@ html, body { margin: 0; background: transparent; overflow: hidden; user-select: 
 img { -webkit-user-drag: none; }
 /* Ghosted so it never competes with the game for attention. */
 #handle {
-  height: 8px; margin: 3px 3px 0; border-radius: 4px; opacity: 0.5; cursor: move;
+  height: 8px; margin: 3px 3px 0; border-radius: 4px; opacity: var(--overlay-opacity, 0.5); cursor: move;
   background: rgba(10, 14, 22, 0.45) repeating-linear-gradient(90deg, transparent 0 4px, rgba(255, 255, 255, 0.35) 4px 6px);
 }
-#rows { display: flex; flex-direction: column; gap: 3px; padding: 3px; opacity: 0.5; }
+#rows { display: flex; flex-direction: column; gap: 3px; padding: 3px; opacity: var(--overlay-opacity, 0.5); }
 .row {
   display: flex; align-items: center; gap: 3px; padding: 2px;
   background: rgba(10, 14, 22, 0.45); border-radius: 5px;
