@@ -1,6 +1,6 @@
 {
   "name": "spell-tracker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Personal League of Legends enemy summoner spell overlay",
   "main": "dist/main/main.js",
