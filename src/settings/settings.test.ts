@@ -73,6 +73,7 @@ describe("Settings", () => {
       overlaySize: 150,
       overlayOpacity: 20,
     });
+    expect(parseSettings(JSON.stringify({ overlaySize: 60 }))).toMatchObject({ overlaySize: 75 });
     expect(parseSettings(JSON.stringify({ overlaySize: "big", overlayOpacity: null }))).toMatchObject({
       overlaySize: 100,
       overlayOpacity: 50,
