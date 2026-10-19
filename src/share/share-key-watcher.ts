@@ -26,7 +26,7 @@ export function createShareKeyWatcher(deps: {
     unwatch();
     const virtualKey = deps.resolve(shareKey);
     if (virtualKey === undefined) {
-      console.error(`Unsupported Share key "${shareKey}": use a single character or F1-F24.`);
+      console.error(`Unsupported Share key "${shareKey}": this key cannot be watched, so pick another in Settings.`);
       return;
     }
     watched = { virtualKey, unwatch: deps.watch(virtualKey, deps.onPress) };

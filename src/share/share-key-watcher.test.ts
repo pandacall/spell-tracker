@@ -76,7 +76,7 @@ describe("Share key watcher", () => {
 
     expect(watches).toEqual([]);
     expect(watcher.virtualKey()).toBeUndefined();
-    expect(errorLog).toHaveBeenCalledWith('Unsupported Share key "nope": use a single character or F1-F24.');
+    expect(errorLog).toHaveBeenCalledWith('Unsupported Share key "nope": this key cannot be watched, so pick another in Settings.');
   });
 
   it("recovers when a changed key is usable again while a game is on", () => {

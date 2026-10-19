@@ -15,7 +15,7 @@ Using it:
 - A small blue icon sits in the system tray, by the clock (it may be hidden under the `^` arrow). Right-click it and choose **Exit** to close the app.
 - The overlay shows up by itself once a game has loaded.
 - **Left-click** an enemy's spell when they use it to start its countdown. **Right-click** it to clear a mistake. Drag the handle to move the overlay.
-- Press **`** (the key under Esc) to type the enemies' Flash timers into chat, then press Enter to send.
+- Press **`** (the key under Esc) to type the enemies' Flash timers into chat, then press Enter to send. That's the Share key; you can change it in Settings.
 - If you can't see the overlay in game, set League's **Window Mode** to **Borderless** (Settings → Video).
 
 Spell Tracker updates itself: it quietly downloads new versions in the background (never during a game) and installs them when you exit. When one is ready, the tray icon's menu also offers **Restart to update**. To uninstall, use Windows **Settings → Apps → Spell Tracker**.

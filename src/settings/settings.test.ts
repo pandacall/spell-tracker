@@ -1,7 +1,7 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const DEFAULTS = { shareKey: "`", autoSend: false, overlaySize: 100, overlayOpacity: 50 };
 
@@ -135,5 +135,59 @@ describe("Settings", () => {
     store.update({ overlayPosition: null });
 
     expect(store.current().overlayPosition).toBeUndefined();
+  });
+
+  it("reads a settings file saved with a byte order mark", () => {
+    expect(parseSettings("﻿" + JSON.stringify({ shareKey: "F8" }))).toEqual({ ...DEFAULTS, shareKey: "F8" });
+  });
+
+  it("saves into a file with a byte order mark without moving it aside", () => {
+    const dir = tempDir();
+    const file = path.join(dir, "settings.json");
+    writeFileSync(file, "﻿" + JSON.stringify({ shareKey: "F8" }));
+
+    saveSettings(file, { autoSend: true });
+
+    expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ shareKey: "F8", autoSend: true });
+    expect(existsSync(path.join(dir, "settings.broken.json"))).toBe(false);
+  });
+
+  it("logs instead of throwing when the store cannot save, and still applies the change", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const file = path.join(tempDir(), "missing-folder", "settings.json");
+    const store = createSettingsStore(file);
+
+    expect(() => store.update({ overlaySize: 120 })).not.toThrow();
+
+    expect(store.current().overlaySize).toBe(120);
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it("does not overwrite a settings file that exists but cannot be read", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const dir = tempDir();
+    // A directory where the file should be: reading it fails with EISDIR, not ENOENT.
+    const file = path.join(dir, "settings.json");
+    mkdirSync(file);
+
+    expect(() => saveSettings(file, { autoSend: true })).not.toThrow();
+
+    expect(statSync(file).isDirectory()).toBe(true);
+    expect(existsSync(path.join(dir, "settings.broken.json"))).toBe(false);
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it("the store still applies a change when the file cannot be read", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const file = path.join(tempDir(), "settings.json");
+    mkdirSync(file);
+    const store = createSettingsStore(file);
+
+    store.update({ autoSend: true });
+
+    expect(store.current().autoSend).toBe(true);
+    error.mockRestore();
   });
 });

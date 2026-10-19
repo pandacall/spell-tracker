@@ -2,7 +2,10 @@ import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 export interface Settings {
-  /** A single character such as "`", or a function key "F1" to "F24". */
+  /**
+   * A single character such as "`", a function key "F1" to "F24", or
+   * "scan:<n>", a physical key by scan code (what the settings window records).
+   */
   shareKey: string;
   /** True: Share also presses Enter to send. False: it types the message and stops, for the user to send. */
   autoSend: boolean;
@@ -10,7 +13,7 @@ export interface Settings {
   overlayPosition?: { x: number; y: number };
   /** How big the overlay is, as a percent of its normal size. */
   overlaySize: number;
-  /** How opaque the overlay is while the pointer is not over it, as a percent. */
+  /** How opaque the overlay is, as a percent. */
   overlayOpacity: number;
 }
 
@@ -25,6 +28,16 @@ function percent(value: unknown, range: { min: number; max: number }, fallback: 
   return Math.round(Math.min(range.max, Math.max(range.min, value)));
 }
 
+/** A settings file's text without the byte order mark some editors put at the start. */
+function withoutBom(text: string): string {
+  return text.startsWith("﻿") ? text.slice(1) : text;
+}
+
+/** True when the error is the file not existing, as opposed to it being unreadable. */
+function isMissing(error: unknown): boolean {
+  return (error as NodeJS.ErrnoException | undefined)?.code === "ENOENT";
+}
+
 /**
  * The settings in a settings file's text. A missing file (undefined), text
  * that isn't a JSON object, and any setting that is absent or the wrong type
@@ -33,7 +46,7 @@ function percent(value: unknown, range: { min: number; max: number }, fallback: 
 export function parseSettings(text: string | undefined): Settings {
   let file: Partial<Record<keyof Settings, unknown>> = {};
   try {
-    const parsed: unknown = JSON.parse(text ?? "null");
+    const parsed: unknown = JSON.parse(withoutBom(text ?? "null"));
     if (typeof parsed === "object" && parsed !== null) file = parsed;
   } catch {
     // Not valid JSON: use the defaults rather than refuse to start.
@@ -59,8 +72,9 @@ export function loadSettings(filePath: string): Settings {
   let text: string | undefined;
   try {
     text = readFileSync(filePath, "utf8");
-  } catch {
-    // No settings file yet.
+  } catch (error) {
+    // No settings file yet, or one that can't be read: use the defaults.
+    if (!isMissing(error)) console.error(`Could not read ${filePath}, using the default settings:`, error);
   }
   return parseSettings(text);
 }
@@ -74,20 +88,26 @@ export type SettingsPatch = Partial<Omit<Settings, "overlayPosition">> & {
  * Applies the patch to the settings file, leaving every other key in it as the
  * user wrote it. Creates the file if there is none. A file that isn't a JSON
  * object is first moved aside to settings.broken.json (replacing any earlier
- * one) so nothing the user typed is lost.
+ * one) so nothing the user typed is lost. A file that exists but can't be read
+ * is left alone and nothing is saved.
  */
 export function saveSettings(filePath: string, patch: SettingsPatch): void {
   let file: Record<string, unknown> = {};
   let text: string | undefined;
   try {
     text = readFileSync(filePath, "utf8");
-  } catch {
+  } catch (error) {
+    if (!isMissing(error)) {
+      // Unreadable is not the same as absent: don't overwrite what may be there.
+      console.error(`Could not read ${filePath}, so not saving settings to it:`, error);
+      return;
+    }
     // No file yet: start a fresh one.
   }
   if (text !== undefined) {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(text);
+      parsed = JSON.parse(withoutBom(text));
     } catch {
       // Falls through to the broken-file handling below.
     }
@@ -106,7 +126,11 @@ export function saveSettings(filePath: string, patch: SettingsPatch): void {
 
 export interface SettingsStore {
   current(): Settings;
-  /** Saves the patch to the file and returns the settings as they now stand. */
+  /**
+   * Saves the patch to the file and returns the settings as they now stand. A
+   * failed save is logged, not thrown: the settings still change in memory for
+   * this session.
+   */
   update(patch: SettingsPatch): Settings;
 }
 
@@ -119,7 +143,11 @@ export function createSettingsStore(filePath: string): SettingsStore {
   return {
     current: () => settings,
     update(patch) {
-      saveSettings(filePath, patch);
+      try {
+        saveSettings(filePath, patch);
+      } catch (error) {
+        console.error(`Could not save settings to ${filePath}:`, error);
+      }
       const { overlayPosition, ...rest } = patch;
       const merged: Settings = { ...settings, ...rest };
       if (overlayPosition === null) delete merged.overlayPosition;
