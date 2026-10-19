@@ -36,6 +36,28 @@ function withPositions(snapshot: typeof draft, positions: Record<string, string>
   };
 }
 
+/** The draft snapshot with one Enemy's items replaced by the given item ids. */
+function withItems(snapshot: typeof draft, championId: string, itemIds: number[]): typeof draft {
+  return {
+    ...snapshot,
+    allPlayers: snapshot.allPlayers.map((player) =>
+      player.rawChampionName === `game_character_displayname_${championId}`
+        ? { ...player, items: itemIds.map((itemID, slot) => ({ ...player.items[0], itemID, slot })) }
+        : player,
+    ),
+  };
+}
+
+/** The draft snapshot with one Enemy's champion level replaced. */
+function withLevel(snapshot: typeof draft, championId: string, level: number): typeof draft {
+  return {
+    ...snapshot,
+    allPlayers: snapshot.allPlayers.map((player) =>
+      player.rawChampionName === `game_character_displayname_${championId}` ? { ...player, level } : player,
+    ),
+  };
+}
+
 /** The game feed failing five polls in a row; returns the signal the last of them gave. */
 function loseFeed(tracker: ReturnType<typeof createTracker>) {
   let signal: ReturnType<typeof tracker.feed>;
@@ -387,6 +409,134 @@ describe("Tracker", () => {
 
     const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
     expect(evelynn?.spells[0].countdown).toBe(seconds);
+  });
+
+  it("shortens a Countdown by the Summoner Spell Haste of the Enemy's Ionian Boots of Lucidity", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withItems(draft, "Evelynn", [1001, 3158]));
+
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    // 300 * 100 / (100 + 10) = 272.7s, shown as the whole second still to go.
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(273);
+  });
+
+  it("shortens a Countdown by 20 Summoner Spell Haste for Crimson Lucidity", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withItems(draft, "Evelynn", [3171]));
+
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    // 300 * 100 / (100 + 20) = 250s.
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(250);
+  });
+
+  it("gives no haste for other boots, or for an Enemy with no items", () => {
+    const tracker = createTracker({ now: () => 0 });
+    // Plated Steelcaps and Boots of Swiftness are boots, but not Lucidity boots.
+    tracker.feed(withItems(withItems(draft, "Evelynn", [3047, 3009]), "Yone", []));
+
+    tracker.mark("Evelynn", "SummonerFlash");
+    tracker.mark("Yone", "SummonerFlash");
+
+    const { rows } = tracker.overlay();
+    expect(rows.find((row) => row.champion.id === "Evelynn")?.spells[1].countdown).toBe(300);
+    expect(rows.find((row) => row.champion.id === "Yone")?.spells[0].countdown).toBe(300);
+  });
+
+  it("takes the haste from the Enemy's boots at the moment of the Mark, not from later", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(draft);
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    tracker.feed(withItems(draft, "Evelynn", [3171]));
+
+    const evelynn = tracker.overlay().rows.find((row) => row.champion.id === "Evelynn");
+    expect(evelynn?.spells[1].countdown).toBe(300);
+  });
+
+  it("puts the hasted Ready Time in the Share Line", () => {
+    const tracker = createTracker({ now: () => 0 });
+    tracker.feed(withItems({ ...draft, gameData: { ...draft.gameData, gameTime: 600 } }, "Evelynn", [3171]));
+
+    tracker.mark("Evelynn", "SummonerFlash");
+
+    // Ready at 600 + 250 = 850s, which is 14:10.
+    expect(tracker.shareLine()).toBe("1410 jg");
+  });
+
+  describe("Teleport", () => {
+    /** The Countdown after Marking `championId`'s Teleport at the given game time, with the given level and items. */
+    function teleportCountdown(
+      championId: string,
+      { gameTime, level, items = [] }: { gameTime: number; level: number; items?: number[] },
+    ): number | undefined {
+      const tracker = createTracker({ now: () => 0 });
+      const snapshot = withItems(
+        withLevel(
+          withSpells({ ...draft, gameData: { ...draft.gameData, gameTime } }, championId, "SummonerTeleport", "SummonerFlash"),
+          championId,
+          level,
+        ),
+        championId,
+        items,
+      );
+      tracker.feed(snapshot);
+      tracker.mark(championId, "SummonerTeleport");
+      return tracker.overlay().rows.find((row) => row.champion.id === championId)?.spells[0].countdown;
+    }
+
+    it("is 300 seconds before 10:00, whatever the level", () => {
+      expect(teleportCountdown("Malzahar", { gameTime: 599, level: 9 })).toBe(300);
+      expect(teleportCountdown("Malzahar", { gameTime: 120, level: 1 })).toBe(300);
+    });
+
+    it("becomes Unleashed Teleport's cooldown from 10:00, from 330 seconds at level 1 down to 240 at level 18", () => {
+      expect(teleportCountdown("Malzahar", { gameTime: 600, level: 1 })).toBe(330);
+      expect(teleportCountdown("Malzahar", { gameTime: 600, level: 18 })).toBe(240);
+    });
+
+    it("steps down evenly with each level in between", () => {
+      // 330 - 90 * (9 - 1) / 17 = 287.6s at level 9.
+      expect(teleportCountdown("Malzahar", { gameTime: 900, level: 9 })).toBe(288);
+    });
+
+    it("is a top-lane Enemy's role-quest Unleashed Teleport, from 300 seconds at level 1 down to 210 at level 18", () => {
+      expect(teleportCountdown("Yone", { gameTime: 900, level: 1 })).toBe(300);
+      expect(teleportCountdown("Yone", { gameTime: 900, level: 18 })).toBe(210);
+    });
+
+    it("is still 300 seconds for a top-lane Enemy before 10:00, whatever the level", () => {
+      expect(teleportCountdown("Yone", { gameTime: 599, level: 18 })).toBe(300);
+    });
+
+    it("is Unleashed Teleport's own cooldown for an Enemy with no Role, since only Role `top` marks the role quest", () => {
+      const tracker = createTracker({ now: () => 0 });
+      tracker.feed(
+        withPositions(
+          withLevel(
+            withSpells({ ...draft, gameData: { ...draft.gameData, gameTime: 900 } }, "Yone", "SummonerTeleport", "SummonerFlash"),
+            "Yone",
+            18,
+          ),
+          { Yone: "NONE" },
+        ),
+      );
+
+      tracker.mark("Yone", "SummonerTeleport");
+
+      const yone = tracker.overlay().rows.find((row) => row.champion.id === "Yone");
+      expect(yone?.spells[0].countdown).toBe(240);
+    });
+
+    it("is shortened by boots like any other spell", () => {
+      // 240 * 100 / 110 = 218.2s.
+      expect(teleportCountdown("Malzahar", { gameTime: 900, level: 18, items: [3158] })).toBe(219);
+      // 210 * 100 / 120 = 175s.
+      expect(teleportCountdown("Yone", { gameTime: 900, level: 18, items: [3171] })).toBe(175);
+    });
   });
 
   it("shows Smite but never Marks it", () => {

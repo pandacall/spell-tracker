@@ -54,6 +54,8 @@ interface FeedSpell {
 }
 
 interface FeedPlayer {
+  items?: Array<{ itemID: number }>;
+  level?: number;
   championName: string;
   rawChampionName: string;
   riotId: string;
@@ -104,8 +106,9 @@ function championOf(player: FeedPlayer): Champion {
 
 const FLASH = "SummonerFlash";
 
-// Base cooldowns in seconds, by spell id; ability haste is not applied yet. Smite
-// is absent on purpose: it is shown but never Marked.
+// Base cooldowns in seconds, by spell id, before any Summoner Spell Haste. Smite
+// is absent on purpose: it is shown but never Marked. Teleport's is its cooldown
+// before it becomes Unleashed Teleport.
 const BASE_COOLDOWN: Record<string, number> = {
   [FLASH]: 300,
   SummonerDot: 180, // Ignite
@@ -116,6 +119,46 @@ const BASE_COOLDOWN: Record<string, number> = {
   SummonerBoost: 240, // Cleanse
   SummonerTeleport: 300,
 };
+
+/** A cooldown in seconds at champion level 1 and at level 18, falling in a straight line between them. */
+interface CooldownByLevel {
+  level1: number;
+  level18: number;
+}
+
+// Teleport turns into Unleashed Teleport at 10:00 and its cooldown then depends on
+// the Enemy's level (patch 26.20 values).
+const UNLEASHED_TELEPORT_AT = 600;
+const UNLEASHED_TELEPORT_COOLDOWN: CooldownByLevel = { level1: 330, level18: 240 };
+// A top-lane Enemy's Teleport is the role quest's, which has a shorter cooldown.
+const TOP_QUEST_UNLEASHED_TELEPORT_COOLDOWN: CooldownByLevel = { level1: 300, level18: 210 };
+
+function cooldownAtLevel(cooldown: CooldownByLevel, level: number): number {
+  const step = (Math.min(Math.max(level, 1), 18) - 1) / 17;
+  return cooldown.level1 + (cooldown.level18 - cooldown.level1) * step;
+}
+
+/** The cooldown in seconds of a spell Marked at the given game time, before any haste. */
+function cooldownOf(spellId: string, game: number, level: number, role?: Role): number | undefined {
+  if (spellId === "SummonerTeleport" && game >= UNLEASHED_TELEPORT_AT) {
+    const cooldown = role === "top" ? TOP_QUEST_UNLEASHED_TELEPORT_COOLDOWN : UNLEASHED_TELEPORT_COOLDOWN;
+    return cooldownAtLevel(cooldown, level);
+  }
+  return BASE_COOLDOWN[spellId];
+}
+
+// Summoner Spell Haste by item id. Only the two Lucidity boots count; Cosmic
+// Insight (a rune, not an item) and everything else is ignored on purpose.
+// Both ids are from Data Dragon's item.json (16.20.1).
+const SUMMONER_SPELL_HASTE: Record<number, number> = {
+  3158: 10, // Ionian Boots of Lucidity
+  3171: 20, // Crimson Lucidity
+};
+
+/** The Summoner Spell Haste an Enemy's items give. */
+function hasteOf(player: FeedPlayer): number {
+  return Math.max(0, ...(player.items ?? []).map((item) => SUMMONER_SPELL_HASTE[item.itemID] ?? 0));
+}
 
 // The feed is polled about once a second and a poll fails on any lag spike or
 // loading hitch, so only this many failures in a row mean the game is over.
@@ -144,6 +187,17 @@ function rowOf(player: FeedPlayer, role?: Role): EnemyRow {
   };
 }
 
+interface EnemyGear {
+  level: number;
+  /** Summoner Spell Haste from the Enemy's boots. */
+  haste: number;
+}
+
+interface EnemiesOfSnapshot extends Pick<OverlayState, "rows" | "roleSetupNeeded"> {
+  /** What each Enemy has right now, by champion id, for the cooldown of a Mark. */
+  gear: Map<string, EnemyGear>;
+}
+
 /**
  * The Enemies of a Summoner's Rift snapshot, or undefined when the snapshot is
  * for another map, has no roster yet, doesn't include the active player (e.g.
@@ -151,7 +205,7 @@ function rowOf(player: FeedPlayer, role?: Role): EnemyRow {
  * be loading). When the feed's positions can't give every Enemy a Role, the rows
  * keep game-feed order and carry none.
  */
-function enemiesOf(snapshot: FeedSnapshot): Pick<OverlayState, "rows" | "roleSetupNeeded"> | undefined {
+function enemiesOf(snapshot: FeedSnapshot): EnemiesOfSnapshot | undefined {
   try {
     if (snapshot.gameData.mapNumber !== SUMMONERS_RIFT_MAP_NUMBER) return undefined;
     const { allPlayers } = snapshot;
@@ -159,15 +213,16 @@ function enemiesOf(snapshot: FeedSnapshot): Pick<OverlayState, "rows" | "roleSet
     if (!me) return undefined;
     const enemies = allPlayers.filter((player) => player.team !== me.team);
     if (enemies.length === 0) return undefined;
+    const gear = new Map(enemies.map((player) => [championOf(player).id, { level: player.level ?? 1, haste: hasteOf(player) }]));
     const roles = enemies.map((player) => ROLE_OF_POSITION.get(player.position ?? ""));
     if (!isCompleteRoles(roles)) {
-      return { rows: enemies.map((player) => rowOf(player)), roleSetupNeeded: true };
+      return { rows: enemies.map((player) => rowOf(player)), roleSetupNeeded: true, gear };
     }
     const rows = enemies
       .map((player, index) => ({ player, role: roles[index] }))
       .sort((a, b) => ROLES.indexOf(a.role) - ROLES.indexOf(b.role))
       .map(({ player, role }) => rowOf(player, role));
-    return { rows, roleSetupNeeded: false };
+    return { rows, roleSetupNeeded: false, gear };
   } catch {
     return undefined;
   }
@@ -202,6 +257,7 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
   const now = options.now ?? (() => performance.now());
   let state: OverlayState = NO_GAME;
   const marks = new Map<string, MarkRecord>();
+  let gear = new Map<string, EnemyGear>();
   let missedPolls = 0;
 
   // The game clock as of the latest snapshot, and when (on our own clock) we
@@ -225,19 +281,24 @@ export function createTracker(options: { now?: () => number } = {}): Tracker {
       const enemies = enemiesOf(parsed);
       if (!enemies) return undefined;
       const signal = state.visible ? undefined : "game-started";
-      state = { visible: true, ...enemies };
+      state = { visible: true, rows: enemies.rows, roleSetupNeeded: enemies.roleSetupNeeded };
+      gear = enemies.gear;
       // A snapshot without a game time leaves the clock as it was.
       const reported = parsed.gameData.gameTime;
       clock = { game: typeof reported === "number" ? reported : gameTime(), seenAt: now() };
       return signal;
     },
     mark(championId, spellId) {
-      const cooldown = BASE_COOLDOWN[spellId];
-      if (!state.visible || cooldown === undefined) return;
+      if (!state.visible) return;
+      const game = gameTime();
+      const { level, haste } = gear.get(championId) ?? { level: 1, haste: 0 };
+      const role = state.rows.find((row) => row.champion.id === championId)?.role;
+      const baseCooldown = cooldownOf(spellId, game, level, role);
+      if (baseCooldown === undefined) return;
       const key = markKey(championId, spellId);
       const existing = marks.get(key);
-      if (existing && remainingOf(existing, gameTime()) > 0) return;
-      marks.set(key, { at: gameTime(), cooldown });
+      if (existing && remainingOf(existing, game) > 0) return;
+      marks.set(key, { at: game, cooldown: (baseCooldown * 100) / (100 + haste) });
     },
     clear(championId, spellId) {
       marks.delete(markKey(championId, spellId));
