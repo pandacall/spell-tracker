@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import customVsBots from "../../fixtures/custom-vs-bots.json";
 import draft from "../../fixtures/draft-summoners-rift.json";
 import { createTracker } from "./tracker";
 
@@ -24,6 +25,20 @@ describe("Tracker", () => {
         { id: "SummonerFlash", name: "Flash" },
       ],
     });
+  });
+
+  it("lists the bot Enemies of a custom game from the other team", () => {
+    const tracker = createTracker();
+
+    tracker.feed(customVsBots);
+
+    expect(tracker.overlay().rows.map((row) => row.champion.name)).toEqual([
+      "Vex",
+      "Leona",
+      "Jinx",
+      "Karthus",
+      "Mordekaiser",
+    ]);
   });
 
   it("ignores games that are not on Summoner's Rift", () => {

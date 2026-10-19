@@ -1,0 +1,536 @@
+{
+  "activePlayer": {
+    "abilities": {
+      "E": {
+        "abilityLevel": 0,
+        "displayName": "Frostbite",
+        "id": "Frostbite",
+        "rawDescription": "GeneratedTip_Spell_Frostbite_Description",
+        "rawDisplayName": "GeneratedTip_Spell_Frostbite_DisplayName"
+      },
+      "Passive": {
+        "displayName": "Rebirth",
+        "id": "RebirthMarker",
+        "rawDescription": "GeneratedTip_Passive_RebirthMarker_Description",
+        "rawDisplayName": "GeneratedTip_Passive_RebirthMarker_DisplayName"
+      },
+      "Q": {
+        "abilityLevel": 0,
+        "displayName": "Flash Frost",
+        "id": "FlashFrost",
+        "rawDescription": "GeneratedTip_Spell_FlashFrost_Description",
+        "rawDisplayName": "GeneratedTip_Spell_FlashFrost_DisplayName"
+      },
+      "R": {
+        "abilityLevel": 0,
+        "displayName": "Glacial Storm",
+        "id": "GlacialStorm",
+        "rawDescription": "GeneratedTip_Spell_GlacialStorm_Description",
+        "rawDisplayName": "GeneratedTip_Spell_GlacialStorm_DisplayName"
+      },
+      "W": {
+        "abilityLevel": 0,
+        "displayName": "Crystallize",
+        "id": "Crystallize",
+        "rawDescription": "GeneratedTip_Spell_Crystallize_Description",
+        "rawDisplayName": "GeneratedTip_Spell_Crystallize_DisplayName"
+      }
+    },
+    "championStats": {
+      "abilityHaste": 8,
+      "abilityPower": 0,
+      "armor": 19,
+      "armorPenetrationFlat": 0,
+      "armorPenetrationPercent": 1,
+      "attackDamage": 51,
+      "attackRange": 600,
+      "attackSpeed": 0.6579999923706055,
+      "bonusArmorPenetrationPercent": 1,
+      "bonusMagicPenetrationPercent": 1,
+      "critChance": 0,
+      "critDamage": 200,
+      "currentHealth": 560,
+      "healShieldPower": 0.05000000074505806,
+      "healthRegenRate": 1.100000023841858,
+      "lifeSteal": 0,
+      "magicLethality": 0,
+      "magicPenetrationFlat": 0,
+      "magicPenetrationPercent": 1,
+      "magicResist": 30,
+      "maxHealth": 560,
+      "moveSpeed": 778.8748779296875,
+      "omnivamp": 0,
+      "physicalLethality": 0,
+      "physicalVamp": 0,
+      "resourceMax": 495,
+      "resourceRegenRate": 1.600000023841858,
+      "resourceType": "MANA",
+      "resourceValue": 495,
+      "spellVamp": 0,
+      "tenacity": 5
+    },
+    "currentGold": 50,
+    "fullRunes": {
+      "generalRunes": [
+        {
+          "displayName": "Summon Aery",
+          "id": 8214,
+          "rawDescription": "perk_tooltip_SummonAery",
+          "rawDisplayName": "perk_displayname_SummonAery"
+        },
+        {
+          "displayName": "Nimbus Cloak",
+          "id": 8275,
+          "rawDescription": "perk_tooltip_NimbusCloak",
+          "rawDisplayName": "perk_displayname_NimbusCloak"
+        },
+        {
+          "displayName": "Transcendence",
+          "id": 8210,
+          "rawDescription": "perk_tooltip_Transcendence",
+          "rawDisplayName": "perk_displayname_Transcendence"
+        },
+        {
+          "displayName": "Waterwalking",
+          "id": 8232,
+          "rawDescription": "perk_tooltip_Waterwalking",
+          "rawDisplayName": "perk_displayname_Waterwalking"
+        },
+        {
+          "displayName": "Bone Plating",
+          "id": 8473,
+          "rawDescription": "perk_tooltip_BonePlatingTooltip",
+          "rawDisplayName": "perk_displayname_BonePlating"
+        },
+        {
+          "displayName": "Revitalize",
+          "id": 8453,
+          "rawDescription": "perk_tooltip_Revitalize",
+          "rawDisplayName": "perk_displayname_Revitalize"
+        }
+      ],
+      "keystone": {
+        "displayName": "Summon Aery",
+        "id": 8214,
+        "rawDescription": "perk_tooltip_SummonAery",
+        "rawDisplayName": "perk_displayname_SummonAery"
+      },
+      "primaryRuneTree": {
+        "displayName": "Sorcery",
+        "id": 8200,
+        "rawDescription": "perkstyle_tooltip_7202",
+        "rawDisplayName": "perkstyle_displayname_7202"
+      },
+      "secondaryRuneTree": {
+        "displayName": "Resolve",
+        "id": 8400,
+        "rawDescription": "perkstyle_tooltip_7204",
+        "rawDisplayName": "perkstyle_displayname_7204"
+      },
+      "statRunes": [
+        {
+          "id": 5007,
+          "rawDescription": "perk_tooltip_StatModCooldownReductionScaling"
+        },
+        {
+          "id": 5010,
+          "rawDescription": "perk_tooltip_StatModMovementSpeed"
+        },
+        {
+          "id": 5001,
+          "rawDescription": "perk_tooltip_StatModHealthScaling"
+        }
+      ]
+    },
+    "level": 1,
+    "riotId": "Player1#0000",
+    "riotIdGameName": "Player1",
+    "riotIdTagLine": "0000",
+    "summonerName": "Player1#0000",
+    "teamRelativeColors": true
+  },
+  "allPlayers": [
+    {
+      "championName": "Anivia",
+      "isBot": false,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "Gustwalker Hatchling",
+          "itemID": 1102,
+          "price": 450,
+          "rawDescription": "GeneratedTip_Item_1102_Description",
+          "rawDisplayName": "Item_1102_Name",
+          "slot": 0
+        }
+      ],
+      "level": 1,
+      "position": "JUNGLE",
+      "rawChampionName": "game_character_displayname_Anivia",
+      "rawSkinName": "game_character_displayname_Anivia",
+      "respawnTimer": 0,
+      "riotId": "Player1#0000",
+      "riotIdGameName": "Player1",
+      "riotIdTagLine": "0000",
+      "runes": {
+        "keystone": {
+          "displayName": "Summon Aery",
+          "id": 8214,
+          "rawDescription": "perk_tooltip_SummonAery",
+          "rawDisplayName": "perk_displayname_SummonAery"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Resolve",
+          "id": 8400,
+          "rawDescription": "perkstyle_tooltip_7204",
+          "rawDisplayName": "perkstyle_displayname_7204"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Anivia",
+      "summonerName": "Player1#0000",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Ghost",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerHaste_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHaste_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Smite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerSmite_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+        }
+      },
+      "team": "ORDER"
+    },
+    {
+      "championName": "Vex",
+      "isBot": true,
+      "isDead": false,
+      "items": [],
+      "level": 1,
+      "position": "MIDDLE",
+      "rawChampionName": "game_character_displayname_Vex",
+      "rawSkinName": "game_character_displayname_Vex",
+      "respawnTimer": 0,
+      "riotId": "Vex#BOT",
+      "riotIdGameName": "Vex",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Vex",
+      "summonerName": "Vex Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Ignite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerDot_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerDot_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Leona",
+      "isBot": true,
+      "isDead": false,
+      "items": [
+        {
+          "canUse": false,
+          "consumable": false,
+          "count": 1,
+          "displayName": "World Atlas",
+          "itemID": 3865,
+          "price": 400,
+          "rawDescription": "GeneratedTip_Item_3865_Description",
+          "rawDisplayName": "Item_3865_Name",
+          "slot": 0
+        }
+      ],
+      "level": 1,
+      "position": "UTILITY",
+      "rawChampionName": "game_character_displayname_Leona",
+      "rawSkinName": "game_character_displayname_Leona",
+      "respawnTimer": 0,
+      "riotId": "Leona#BOT",
+      "riotIdGameName": "Leona",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Grasp of the Undying",
+          "id": 8437,
+          "rawDescription": "perk_tooltip_GraspOfTheUndying",
+          "rawDisplayName": "perk_displayname_GraspOfTheUndying"
+        },
+        "primaryRuneTree": {
+          "displayName": "Resolve",
+          "id": 8400,
+          "rawDescription": "perkstyle_tooltip_7204",
+          "rawDisplayName": "perkstyle_displayname_7204"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Leona",
+      "summonerName": "Leona Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Ignite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerDot_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerDot_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Jinx",
+      "isBot": true,
+      "isDead": false,
+      "items": [],
+      "level": 1,
+      "position": "BOTTOM",
+      "rawChampionName": "game_character_displayname_Jinx",
+      "rawSkinName": "game_character_displayname_Jinx",
+      "respawnTimer": 0,
+      "riotId": "Jinx#BOT",
+      "riotIdGameName": "Jinx",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Press the Attack",
+          "id": 8005,
+          "rawDescription": "perk_tooltip_PressTheAttack",
+          "rawDisplayName": "perk_displayname_PressTheAttack"
+        },
+        "primaryRuneTree": {
+          "displayName": "Precision",
+          "id": 8000,
+          "rawDescription": "perkstyle_tooltip_7201",
+          "rawDisplayName": "perkstyle_displayname_7201"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Jinx",
+      "summonerName": "Jinx Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Barrier",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerBarrier_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerBarrier_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Karthus",
+      "isBot": true,
+      "isDead": false,
+      "items": [],
+      "level": 1,
+      "position": "JUNGLE",
+      "rawChampionName": "game_character_displayname_Karthus",
+      "rawSkinName": "game_character_displayname_Karthus",
+      "respawnTimer": 0,
+      "riotId": "Karthus#BOT",
+      "riotIdGameName": "Karthus",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Karthus",
+      "summonerName": "Karthus Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Exhaust",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerExhaust_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerExhaust_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Smite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerSmite_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    },
+    {
+      "championName": "Mordekaiser",
+      "isBot": true,
+      "isDead": false,
+      "items": [],
+      "level": 1,
+      "position": "TOP",
+      "rawChampionName": "game_character_displayname_Mordekaiser",
+      "rawSkinName": "game_character_displayname_Mordekaiser",
+      "respawnTimer": 0,
+      "riotId": "Mordekaiser#BOT",
+      "riotIdGameName": "Mordekaiser",
+      "riotIdTagLine": "BOT",
+      "runes": {
+        "keystone": {
+          "displayName": "Arcane Comet",
+          "id": 8229,
+          "rawDescription": "perk_tooltip_ArcaneComet",
+          "rawDisplayName": "perk_displayname_ArcaneComet"
+        },
+        "primaryRuneTree": {
+          "displayName": "Sorcery",
+          "id": 8200,
+          "rawDescription": "perkstyle_tooltip_7202",
+          "rawDisplayName": "perkstyle_displayname_7202"
+        },
+        "secondaryRuneTree": {
+          "displayName": "Domination",
+          "id": 8100,
+          "rawDescription": "perkstyle_tooltip_7200",
+          "rawDisplayName": "perkstyle_displayname_7200"
+        }
+      },
+      "scores": {
+        "assists": 0,
+        "creepScore": 0,
+        "deaths": 0,
+        "kills": 0,
+        "wardScore": 0
+      },
+      "skinID": 0,
+      "skinName": "Mordekaiser",
+      "summonerName": "Mordekaiser Bot",
+      "summonerSpells": {
+        "summonerSpellOne": {
+          "displayName": "Flash",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+        },
+        "summonerSpellTwo": {
+          "displayName": "Ignite",
+          "rawDescription": "GeneratedTip_SummonerSpell_SummonerDot_Description",
+          "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerDot_DisplayName"
+        }
+      },
+      "team": "CHAOS"
+    }
+  ],
+  "events": {
+    "Events": [
+      {
+        "EventID": 0,
+        "EventName": "GameStart",
+        "EventTime": 0.039110299199819565
+      }
+    ]
+  },
+  "gameData": {
+    "gameMode": "CLASSIC",
+    "gameTime": 19.594858169555664,
+    "mapName": "Map11",
+    "mapNumber": 11,
+    "mapTerrain": "Default"
+  }
+}

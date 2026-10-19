@@ -1,4 +1,5 @@
 interface RiotIdentity {
+  isBot?: unknown;
   riotId?: unknown;
   riotIdGameName?: unknown;
   riotIdTagLine?: unknown;
@@ -16,6 +17,8 @@ export function scrubSnapshot(snapshot: unknown): unknown {
   const data = snapshot as { allPlayers?: RiotIdentity[] };
   const replacements = new Map<string, string>();
   (data.allPlayers ?? []).forEach((player, index) => {
+    // Bots have no identity to hide, and their name is just their champion's.
+    if (player.isBot === true) return;
     const label = `Player${index + 1}`;
     const tag = "0000";
     const add = (original: unknown, replacement: string) => {
